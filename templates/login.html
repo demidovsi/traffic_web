@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+
+    <head>
+    <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="shortcut icon" href="/static/motorway.png" >
+        <title>Login</title>
+  </head>
+        <!-- вывести все ошибки анализа ввода -->
+        {% for message in get_flashed_messages(with_categories=True) %}
+        <div class="alert alert-{{ message[0] }}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1] }}
+        </div>
+        {% endfor %}
+        <div class="container" style="background: lightblue; color: black;">
+            <form method="post">
+                <div>
+                    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
+                    <a class="text">User name:</a>
+                    <input id="user_name" name="user_name" class="form-control"
+                           placeholder="Input user name">
+                    <a class="text"></a> Password:
+                    <input type="password" id="password" name="password"
+                           class="form-control" placeholder="Input password">
+                    <p></p>
+
+                    <a class="text"></a> Theme:
+                    <select class="combo" name="select_theme" id="theme">
+                        <option value="black" selected>black - dark background</option>
+                        <option value="white">white - light background</option>
+                    </select>
+                    <p></p>
+
+                    <a class="text"></a> Language:
+                    <select class="combo" name="select_language" id="language">
+<!--                        <option value="ru">RU - Russian (русский)</option>-->
+<!--                        <option value="en" selected>EN - English (английский)</option>-->
+<!--                        <option value="iw">HE - Hebrew (иврит)</option>-->
+                        {% for lang in languages %}
+                            {% if lang['key'] == select_language %}
+                                <option value="{{lang['key']}}" selected>{{lang['name']}}</option>
+                            {% else %}
+                                <option value="{{lang['key']}}">{{lang['name']}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <p></p>
+                    <p>
+                    <button type="submit" class="btn" value="Принять"> Submit</button>
+                    </p>
+                </div>
+        <div class="time_now">
+            <input name="time_now" id="time_now" value="" hidden>
+        </div>
+            </form>
+        </div>
+<script>
+    var z = document.getElementById("time_now");
+    z.value = Date();
+    document.write(' &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  Traffic-web  &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' + z.value);
+</script>
+</html>
+

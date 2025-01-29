@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Speedometer Chart</title>
+</head>
+<body>
+<div style="width: 600px; height: 400px;">
+    <canvas id="oilChart"></canvas>
+</div>
+    <script>
+        var oilCanvas = document.getElementById("oilChart");
+
+        var oilData = {
+            labels: [
+                "Безопасно", "Внимание", "Аварийно", "Прогноз на поездку"
+                ],
+            datasets: [
+                {
+                    label: "Riskmeter",
+                    data: [17, 7, 7, 0],
+                    backgroundColor: [
+                        "lightgreen",
+                        "yellow",
+                        "red",
+                        "blue"
+                    ],
+                    borderColor: "black",
+                    borderWidth: 0
+                },
+                {
+                    data: [32, 0],
+                    backgroundColor: [
+                        "blue",
+                        "white",
+                    ],
+                    borderColor: "black",
+                    borderWidth: 0
+                }
+                ]
+        };
+
+        var chartOptions = {
+          rotation: -90,
+          cutoutPercentage: 0,
+          circumference: 180,
+          legend: {
+            position: 'left'
+          },
+          animation: {
+            animateRotate: true,
+            animateScale: true
+          }
+        };
+
+        var pieChart = new Chart(oilCanvas, {
+          type: 'doughnut',
+          data: oilData,
+          options: chartOptions
+        });
+    </script>
+</body>
+</html>

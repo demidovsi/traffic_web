@@ -1,0 +1,20 @@
+<header>
+    <div class="dws_menu">
+    <nav class="dws-menu">
+        <ul>
+            <li><a href="{{url_for('road', user_id=upr['user_id'])}}">Route</a></li>
+            <li>
+                <a href="#">Language</a>
+                <ul>
+                    {% for lang in upr['languages'] %}
+                        <li><a href="{{url_for('choose_language', user_id=upr['user_id'], lang=lang['key'])}}">
+                            {{lang['name']}}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li><a href="{{url_for('login')}}">Login</a></li>
+        </ul>
+    </nav>
+    </div>
+</header>
+<link rel="stylesheet" type="text/css" href="/static/css/menu2.css">

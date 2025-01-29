@@ -1,0 +1,66 @@
+import common
+import json
+from google.oauth2 import service_account
+from google.cloud import bigquery
+
+
+credentials = None
+client = None
+catalog = '`playground-332710`'
+
+t = 'w4ZzwpLCicKOw6DCmsKpwp1TwoXCicKUw5zDkcOewpfCosKbwpbCqsOKw5XDjMObw6HCj8KtWl1VwonCksKLw5zDnsKQwqPCncKUwr_DiMObw43CjsKmQVvCqMKdwqzDosOZw5vDm8Ohwo_CnWVkfsKbwqnCmsKcwo5NQ1hRbcOZw6TDksOiw43ClcKewpfCnMKww6LDkcOSw5DCjltZWsKWfcOMwqrCnsOPwqNYbcKZYX3DjsOVwp3DjsKeVMKfwp7Cl8Ksw43Cq8Kaw5LCn1Jqb2XCg8KfwqTDj8ORwpxWcm5Td3PCksKJwo7DnMKTwqLCrsKSwr_DjsORw5TDkcOlQ3NYU3jClsKfwpbCmcKuZsKAwoF_a8K5w4TCssOCwq11flh8wpDDgsKfwpbCmcKZTsKVwqZ-wpTCssK3w5_CrcK1Y3p8csKZwqvDmcOUw53DlMKMwqJ_asOCwpnCtMKqwr3CsWd6ecKEwo7Cq8K9w4LDo8OTwojCjMKhcsKywq7Cs8Kqw5vCtWN6wol0wqPCmMK4w5TDosOgwo_Co2nCnn3CssK_w4XDmsOmWn7ChsKmwr3DmsOaw5jDoMKxwozChmNpwozDmcOKwrrCvMOeZW9jwp3DgsKawr7CnsKkw5LCmmTCrmnDhcObw4rCrcOZw4BlcH16wqHCncKlwrPDmMOBVMKtwq_ClsKEwr_DgsK3wq_Dg3DCjcKGwo3CucKawrTCtMOgwqHCm8KqwqlkwrjDmcK9w6DDpcK2wodwwoHCo8KAw4PDlMKbw43DosKIacKSfsOBw5bCqcOdw6bCvllwwo7CqcKOw5vCncKrwpfCrm3CgGd2fMK1wqHDg8OPw59nccKiYcKfw5HCvcOgwr7DiMKPbMKvwqDCnMORw4vDgcK5w45uwqRrwql7w5vDrMOZwqXCoXvCnMKxdsKEwrXCtsKxw6TCtHZ6wpF1wpPDjcKhw5vCosOdwpR7wodcwpbDkcKmwrjDjcK4wpHCp8KBwqnCmcORw5jDkMOcwrpQwp7ChnR-w4XDoMK7w6PDpMKYwqV8wpnCoMOVw4nDocKxw5DCgsKKwoBnwr7DksOnwqzDkcKtUcKqfMKDwpDDncOCw57CvMOYV8KNbcKUwqHCm8Oaw4LDgMK3ecKqwobCpMKswrDCosORwrfDmcKDwq7CosKHwpLDjsOVwrnDgsONY8KVwqbCm8Ksw5TDmsKtwp3DlsKJwoPCh8KnwrnCtsK0wrDCv8ONwoxxwpnCpMKjwrfDpsKsw6XDomjCp8KbZMKawrjDqsOcw5PCvsKGe8KjdcKiw5bDnMOBwq7ConPCrcKBYsKwwrzCp8K_w5PDnm7CicKaZcKjw43DmMOFw5rCtEzCk8KLwqnCt8OAw4zCqsOTwrljenl2wo7DkMOZwq7CrcKtdcKkbXbCrMOgw5nCucKkw6FawqrCisKhf8ONw4vCrsKXw6Jiwo7CsnnCv8KxwqvDjsKgw4bCmMKuwrB4wp3DocOgw4_DgcOWUMKtwoDCjcK5w5_Dl8KfwrHDg3TCoH3CmcKNwq7CtsOdwq_DlXnCrGnCncKewrnDmcOPwqXDhlHCncKgwqd6wrjDhsORw4_DlntywpDCksKTw5TCncKtw4PDpHXCn8KwwpzCssOUw5fDlcKiw5NpfsKJwqfCgcOSw5nCusOAw4jCj8KQbcKewrbDgsK5wr3DmsOTwo_Ck2zCoH_CrcOdwq_CtcK_dMKKwrB5wpzDlcK4wp7DpcObwottwpDCksKXw4DDk8OSw6XCpG9_wpFowrfDnsOnwrPCscKXwoPChcKmdMKZw4PCncOUw5DCpHnCoWjCnsOCw4XDoMObw4HCn8KawonCpMKfwp_CrsOHwpzDpsOCwo3CpsKHwph7w4zDqMOSw6PDgMKVacKRwqjCrMKxw5PCsMK3wr1Zb8KDwoLCssK_w4rDg8OQwrrCm8KtwqPClHrDmMOMwrfDjcOldnDCksKHwrrDm8Obwp3Do8OCe8KVwqbCmMKbwqrDlMOawqXCvnJobmTCmcK-wqrDmsK0wrdVb8KcwofCs8ODw57CosOhwrxYwpvCrMKgwprDl8OkwqvDlsK0wpfCscKEwpbCmsK9w4HCs8OPw51Zwo7CoGXCoMKuw6XCscK8w4bCkcKqacKkwpjDocKrw4XDmsOewoTCosKOeHzDnMKzwp_CucOkwpTCs8KLfcKuw6HDl8KzwrfDnVDCkMKlwqnCu8KZw5nCucKfwr93wpLCjMKKwpvDk8OswprCosKtwpjChHrCmMKcwq3Dg8Obw5fCsGLCmsKdwobDhMOPw5vClMKfw6TCksKewqnCjcK5w6LDqMK6w47Dm3J6fsKBwo3DksK0wrrDhcObwovCpsKRwovCk8KhwqLDm8K-w6TCmMKkwqXCm8KAwqzDoMObw53Dg3ppwqFcw4TDjsOiwrnCnMOCb3puwpV-wq7CuMOOw6DCo2vCn8KBfsKEw4vDncONwrfDiMKPaGPCk8K8wpjCs8KZwq7Dk2TCpGnCm8KywqvDosKqwpzCsW_CkcKNwqHCmMOMwr3Cr8Kkw6N6wpzColzCg8ODw6TCtsK9w5BQbHHCnMKyw5TDpcKgw4XDpGfCh8KkfsKYw5nDgsOVwqDDg1LCkXvChMK6w4XDoMKfw5bDk8KZwqDCocKowozDmMOXw4vDjcOAwoTCqsKDwqHCv8OMw6XCncKdwqFvasKvfMKNw5DDg8KswqLDj8KXaMKNY8Kfwq_DpMOcw6LDmMKFwozCpMKjwrfDgMOXwrPDlMKuWsKiwoHClMK6w4DCqsKUwrrCt3HClcKmwqrCt8K0w6HCq8Kjwr1TwoPCnMKAw4PCtcOjwqDCvsK0wobCgMKawoLCr8Ktw6LCsMK_wrzCmcKjwo5kwp_CocOWw5jDmMOfacKfwq3CgcK3wqHDpsOgw4LCo8KMfsKid8KUw6LDg8K_w6LCvWTCncKZacKSw6HDpsOFw5rDhcKQwrN5dsKRwpvDmcOiwrLDhcKbwobCpXPCssOBw6nCv8K1w5vChmzCo1zCkcOawqfDocK5wp3ClMKlfsKiwrPCt8OawrXCtcOQYsKHwoXCp8Kuw4PCvcOfw6XDm2zCssKxZ8K2wrHDq8K3wrPDhMKScmfCjcK5w4DCpcK_w5vCm2LCpsKpdcOCwrTCtMOQwq3CpGzCsMKAwpjCsMK0w5jDnMKlw6R2wqt-acOCw5DCu8OYwr7DksKUwq_Cr8KWwrPDlMOIwrTDksKewpTCpGN6woPCucK2wqHDjsOlUsKOelzCl8OMw5PCnMOXw4jCj8Klwod-w4XCssKkwr7Cs8KzcMKwwp7CqMKbwrTCo8Khw4LDocKPwrBuasKsw4HDncOdw57Cv1Z7woHCksKww5LCncK8w5nCs1LCjWh-wrLCmMOGwp_DgcOXecKfwpJ7wqzDgcOdwp_CtMKka8Kpe8KYwrHDhcOgwpvDkcOZesKAwrHCi8KUw5LCucOYw5fDncKWwrHChnjCusOBwr_DoMObw5VkwoVsYcK5wrDDq8Kaw5TCnW3ChsKbZcOBw4zDi8OdwrTCpFBufGPCtMK-w4TDkcOEwrtSfW1ywrrCsMKzwr_DmcOZdMKVwqZ3wpLCncOAwrXCosK5wo3CkGxiwrrDk8OswpTDhMOFwoZpwqVcwo7Dg8K-w6DDhcOQVWxpwpbCscKhwqTDosK7w5tRwoHCp2PCnMOOw4LCmcOVwpdvwoXCo2TCoMOaw6rCusK-w6XCkcKKecKHwrrDksOFw4XDmsKeZn3CrsKVwpbDgcK6w5rDo8OPworCgMKRworCvsKYw4jCvcOQw5TCh3rCrsKrwp_CmMKqw5jCuMKeV3zCoHrCl8Ocw6XDi8OZwp9rwp7Ch8KXfMOfwr3DnMK-wpxtwqLCq3fCusKww6nCmcK-wr1kZMKCwo3CucOiw4vDlsOfwrjClsKdfmPCj8Kaw53Ct8Kiwr7ChcKswpxofMOCw4HCosOYw5NMwqd7worCl8Kew5XDm8OVw5lzwq7CisKGwo7DkMOLwqvCuMKuaMKwwpB3fMOgw6PDg8Kew4NiwqfChGnClsORwrrCu8OSw4jCj8KqfMKJf8Oaw5rCtcOXw5JWwrHCj8KAwqPCvsKrwpnDgMOSa8KSwox_w4TCtcOZwr3Co8OEwoLCqWjCnsOBwqzCqsKtwr_DjlHCoMKqwqB7wr_CvcK5wp7CscKIwoXCssKEwq7CmcKqw4PDjcKvY2_CssKHw4PDhcOgw5vDpsOEwovCsH7ClsK0wrHCtcOdwrLCtFXCmsKKasKyw4rDmcKaw5PCu8KJwqbCnMKJw4HCtsKdw57Do8KweMKlwqR0wrTCm8OdwpjCtMKXasKOwoTCicKVw5fDl8OXwr3DkMKVwqXCjsKiwrHDm8OYwr3DlcOewobClcKmwqrCvsKYw4DDjMKbwq3CgsKKwoF9wpzCqsKjw5XCvMOQbMKKwprClcKMwqbCr8OFw5rCmU5mZV7CkMK3wrbCicK8wr5qwo95woXCkMKJwr3CrsOFwplOZmVewqfDl8KUwpV2woxBW8Kbwp3CtMOOw6DDncOLw5HCjsKawqHCnW3Co8KSwovDl8OVwpPCpMKZwpXCsMOWw5vDjcObw6JOwqDCpcKSwrTDlcKfw4zDm8OZYcKpwqTCksOEw5DDpMOYw6HDmsKFZmtkfcKgwqPCmcKaw5XCgsKmZsKYwr7DjsOkw5_DlcOPwobCmsKbwpTCusOew6DDncKaw4_CkMKmWl1VwonCksKLw4_DmMKKwp7CpsKlwqrDksOWwovCpsKMQ2ppZsKDwpvCp8KZwqHCnlFybGbChMKbwqXCn8KcwqBTa1pdVcKJwpLCi8ONw6HClcKhwpfCpsK9w5LClMKjwozCjsKJwq3CrMKhwr7Co8KhwpjDjcOPwoTCqMKtwp_Cv8OcwqDDkMObw5vCiMKlwp1fwq7DmMOfwpjDm8KbwpDCmsKtwqXCs8KbwqHDisOhw6DCiVtkO2vCicKUw53Dm8OXwobCp8KXwqbCvcOSwpTCo8KMwo7CicKtwqzCocK-wqPCocKYw5vDjcKWwq3CoGN5w5DDocOYw5PDmMKGwprCqMKawr7Cl8OVw5jDmcKbwpXCqMKjwpbCucKLwp5zwozCjEPCmsKtwqXCs8OIw6LDm8Obw6LCisKdwp3Co8Kqw6HCp8KZwqXDi8KEwp7CqsKlwqrDnsOkw5XCjsKmQVvCoMKlwr_DmcOlwqPCm8KbwpjCsMKvX8Kyw5jDocOQw5jDkcKCwqnCocKkecOMw6HDlsKbw5vCgsKuwqzCmX3CmMOowprCm8OPwobCq8KswqRtwpV8wonCjMKOwoTCpcKhwpbCucOdw5HDocKhwpxawpjCm8KWwr3DncORw57DnsOYQ3NYU8Kzw53DpsOZw5_CplBowq_CqMOCwpfDmcOYw5vDk8KNwp7CmcKhwrTDnMKgw4zDm8OZUMKrwqfCk8K6w53CocOfwp3Cm8KOwp7CrMKSwq_DisOmw4rCm8OkVmlxYMK2w5LDpMOUw43DkMKGwqbCocKVwrrDn8Kfw5DDmcONworCpWXClMK6w5bCl8KdwpzDnMKNwprCscKYwr3DmMOnw5fDkMKZVGxqaHzCmcKgw5LDjcOZT8KgwqvClsK9w5_Dm8OMw5HDjcKEwpzCp8KmwrnDncKgw4zDm8OZQ0PCtTs='
+
+def init_work():
+    """
+    Initializes the BigQuery client using service account credentials.
+
+    This function decodes the service account credentials, creates a
+    BigQuery client, and sets the global variables `credentials`,
+    `client`, and `catalog`.
+
+    Globals:
+        credentials (google.oauth2.service_account.Credentials): The service account credentials.
+        client (google.cloud.bigquery.Client): The BigQuery client.
+        catalog (str): The catalog name.
+
+    """
+    # создать клиента для работы с big-query
+    global credentials, client, catalog
+    txt = common.user_decode(t)
+    credentials = service_account.Credentials.from_service_account_info(json.loads(txt))
+    # Construct a BigQuery client object using the service account credentials
+    client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+
+
+def execute_script(query, need_answer=True):
+    """
+    Executes a BigQuery script and optionally returns the results.
+
+    Args:
+        query (str): The SQL query to execute.
+        need_answer (bool): If True, the function returns the query results.
+                            If False, it returns 'ok' upon successful execution.
+
+    Returns:
+        tuple: A tuple containing a boolean indicating success or failure,
+               and the query results or an error message.
+    """
+    try:
+        # Execute the query
+        query_job = client.query(query)
+        # Fetch the results
+        results = query_job.result()
+        if need_answer:
+            answer = list()
+            # Collect the results into a list of dictionaries
+            for row in results:
+                values = dict()
+                for key in row.keys():
+                    values[key] = row[key]
+                answer.append(values)
+            return True, answer
+        else:
+            return True, 'ok'
+    except Exception as err:
+        # Return False and the error message if an exception occurs
+        return False, f"{err}"

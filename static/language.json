@@ -1,0 +1,128 @@
+{
+    "de": {
+        "road": [
+            "Ausgangspunkt",
+            "Endpunkt",
+            "Route berechnen",
+            "Zeit Ereignis",
+            "Entfernung km",
+            "Reisezeit",
+            "Gesamtgewicht",
+            "Alle Wegpunkte",
+            "Nur Unfallpunkte",
+            "Koeffizient",
+            "Sicher",
+            "Aufmerksamkeit",
+            "Notfall",
+            "Reiseprognose"
+        ]
+    },
+    "en": {
+        "road": [
+            "Starting point",
+            "End point",
+            "Calculate route",
+            "Start time",
+            "Distance km",
+            "Travel time",
+            "Total weight",
+            "All waypoints",
+            "Only accident points",
+            "Coefficient",
+            "Safe",
+            "Attention",
+            "Emergency",
+            "Trip Forecast"
+        ]
+    },
+    "es": {
+        "road": [
+            "Punto de partida",
+            "Punto final",
+            "Calcular ruta",
+            "Hora de inicio",
+            "Distancia km",
+            "Tiempo de viaje",
+            "peso total",
+            "Todos los puntos de referencia",
+            "Solo puntos de accidente",
+            "Coeficiente",
+            "Seguro",
+            "Atención",
+            "Emergencia",
+            "Pronóstico del viaje"
+        ]
+    },
+    "fr": {
+        "road": [
+            "Point de départ",
+            "Point final",
+            "Calculer l'itinéraire",
+            "Heure de début",
+            "Distance km",
+            "Temps de trajet",
+            "Poids total",
+            "Tous les points de cheminement",
+            "Seuls les points d'accident",
+            "Coefficient",
+            "Sûr",
+            "Attention",
+            "Urgence",
+            "Prévisions de voyage"
+        ]
+    },
+    "he": {
+        "road": [
+            "נקודת מוצא",
+            "נקודת סיום",
+            "חשב מסלול",
+            "שעת התחלה",
+            "מרחק ק\"מ",
+            "זמן נסיעה",
+            "משקל כולל",
+            "כל נקודות הציון",
+            "רק נקודות תאונה",
+            "מְקַדֵם",
+            "בְּבִטחָה",
+            "תְשׁוּמַת לֵב",
+            "חֵרוּם",
+            "תחזית טיול"
+        ]
+    },
+    "ru": {
+        "road": [
+            "Начальная точка",
+            "Конечная точка",
+            "Рассчитать маршрут",
+            "Время начала",
+            "Расстояние км",
+            "Время пути",
+            "Суммарный вес",
+            "Все точки маршрута",
+            "Только точки аварий",
+            "Коэффициент",
+            "Безопасный",
+            "Внимание",
+            "Чрезвычайная ситуация",
+            "Прогноз на поездку"
+        ]
+    },
+    "zh-CN": {
+        "road": [
+            "起点",
+            "终点",
+            "计算路线",
+            "开始时间",
+            "距离 公里",
+            "旅行时间",
+            "总重量",
+            "所有航线点",
+            "仅限事故积分",
+            "系数",
+            "安全的",
+            "注意力",
+            "紧急情况",
+            "行程预测"
+        ]
+    }
+}

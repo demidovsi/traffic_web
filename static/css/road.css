@@ -1,0 +1,107 @@
+.bottom {
+    position: absolute;
+    top: 150px;
+    width: 90%;
+    height: 80%;
+    /*border-style: groove;*/
+}
+
+.points {
+padding-left: 50px;
+    padding-top: 50px;
+    padding-bottom: 5px;
+}
+
+.data {
+    position: absolute;
+    width: 780px;
+    height: 570px;
+    top: 120px;
+    left: 10px;
+    border-style: groove;
+    overflow: auto;
+}
+
+.data-chart {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    top: 120px;
+    left: 10px;
+    border: none;
+    padding-left: 50px;
+}
+
+.simple-text {
+    border: none;
+}
+
+.simple-button {
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+}
+
+input {
+    accent-color: auto;
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+}
+
+.container-flash {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    width: 500px;
+    z-index: 100;
+}
+
+#map_f4ea2d590327241e553f226e8564c166 {
+    position: relative;
+    width: 600px;
+    height: 540px;
+    left: 810px;
+    top: 10px;
+}
+
+.switch {
+    position: relative;
+    width: 600px;
+    height1: 50px;
+    left: 810px;
+    top: 0px;
+}
+
+thead {  /* для всех таблиц фиксируем заголовок */
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  top: -3px;
+}
+
+#newsTable {
+    width: 600px;
+    border-collapse: collapse; /* Убираем двойные линии между ячейками */
+    border: none;
+    overflow: auto;
+}
+
+th, td {
+    border: 0.5px solid lightgray;
+    padding: 10px;
+}
+
+.btn-menu {
+    border: none;
+    border: 1px solid #808080;
+    height: 30px;
+}
+
+.btn-menu-active {
+    border: 1px solid green;
+    border1: 1px solid #808080;
+    height: 30px;
+}
+
+.fa-class {
+    font-size: 12px;
+}

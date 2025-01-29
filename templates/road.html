@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Маршрут
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/road.css">
+<form method="post" name="{{own}}">
+    <input type="hidden" id="timezone" name="user_id" value="">
+    <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+    <div class="top">
+        <span style="font-size:18px; font-weight: bold; color: {{colors['green']}};"> {{par['title']}} </span>
+        {% include "include/dates.html" %}
+        <div class="points">
+            Старт=
+            <input id="start_point" name="start_point" class="input_point"
+                   style="background: {{colors['background']}}; color: {{colors['black']}}"
+                   placeholder="Input start point">
+            Финиш=
+            <input id="end_point" name="end_point" class="input_point"
+                   style="background: {{colors['background']}}; color: {{colors['black']}}"
+                   placeholder="Input end point">
+            <button type="submit" name="calculate" class="simple-text"
+                    style="background: {{colors['background']}}; color: {{colors['red']}}"
+                    title="Рассчитать маршрут">
+                <u>Calculate</u>
+            </button>
+        </div>
+    </div> <!-- top -->
+    <div class="bottom">
+        <div class="data">
+        </div> <!-- data -->
+        <div class="graph">
+        {% include "include/route_map.html" %}
+        </div> <!-- graph -->
+    </div> <!-- bottom -->
+</form>
+{% endblock %}
+
+{% block scripts %}
+      {{super()}}
+  <script>
+        const scroller = document.querySelector('.datas');
+        const scroll = document.querySelector("#scroll")
+    $(function() {
+        $(document).ready(function () {
+            $('#combobox').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#start').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#page_number').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('select').on('change', function() { document.forms['{{own}}'].submit(); });
+
+            {% if par['do_update'] %}
+                setTimeout(
+                  () => {document.forms['news'].submit();}, 60*1000
+                );
+            {% endif %}
+
+            $(function () {
+                $('body').show();
+                scroller.scrollTop=scroll.value;
+            }); // end ready
+        });
+
+        scroller.addEventListener("scroll", (event) => {
+            scroll.value = scroller.scrollTop;
+                });
+    });
+  </script>
+
+{% endblock %}
