@@ -35,7 +35,8 @@ def prepare_form(request):
             'user_id': user_id,
             'theme': request.form.get('select_theme'),
             'colors': colors.colors[get(user_id, 'theme')],
-            'languages': config.languages
+            'languages': config.languages,
+            'select_language': request.form.get('select_language')
         }
         add(user_id, 'upr', upr)
 

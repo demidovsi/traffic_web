@@ -14,7 +14,9 @@
             "Sicher",
             "Aufmerksamkeit",
             "Notfall",
-            "Reiseprognose"
+            "Reiseprognose",
+            "Berücksichtigung von Unfällen",
+            "Verteilung der Koeffizienten entlang der Route"
         ]
     },
     "en": {
@@ -32,7 +34,9 @@
             "Safe",
             "Attention",
             "Emergency",
-            "Trip Forecast"
+            "Trip Forecast",
+            "Taking into account accidents",
+            "Distribution of coefficients along the route"
         ]
     },
     "es": {
@@ -42,15 +46,17 @@
             "Calcular ruta",
             "Hora de inicio",
             "Distancia km",
-            "Tiempo de viaje",
-            "peso total",
+            "tiempo de viaje",
+            "Peso total",
             "Todos los puntos de referencia",
             "Solo puntos de accidente",
             "Coeficiente",
             "Seguro",
             "Atención",
             "Emergencia",
-            "Pronóstico del viaje"
+            "Pronóstico del viaje",
+            "Teniendo en cuenta los accidentes",
+            "Distribución de coeficientes a lo largo del recorrido"
         ]
     },
     "fr": {
@@ -68,7 +74,9 @@
             "Sûr",
             "Attention",
             "Urgence",
-            "Prévisions de voyage"
+            "Prévisions de voyage",
+            "Prise en compte des accidents",
+            "Répartition des coefficients le long du parcours"
         ]
     },
     "he": {
@@ -83,10 +91,12 @@
             "כל נקודות הציון",
             "רק נקודות תאונה",
             "מְקַדֵם",
-            "בְּבִטחָה",
+            "כַּסֶפֶת",
             "תְשׁוּמַת לֵב",
             "חֵרוּם",
-            "תחזית טיול"
+            "תחזית טיול",
+            "תוך התחשבות בתאונות",
+            "התפלגות המקדמים לאורך המסלול"
         ]
     },
     "ru": {
@@ -104,7 +114,9 @@
             "Безопасный",
             "Внимание",
             "Чрезвычайная ситуация",
-            "Прогноз на поездку"
+            "Прогноз на поездку",
+            "С учетом аварий",
+            "Распределение коэффициентов по маршруту"
         ]
     },
     "zh-CN": {
@@ -116,13 +128,15 @@
             "距离 公里",
             "旅行时间",
             "总重量",
-            "所有航线点",
+            "所有航点",
             "仅限事故积分",
             "系数",
             "安全的",
             "注意力",
             "紧急情况",
-            "行程预测"
+            "行程预测",
+            "考虑到事故",
+            "沿路线的系数分布"
         ]
     }
 }

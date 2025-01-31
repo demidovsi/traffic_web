@@ -2,3 +2,4 @@ cache
 venv_win
 .idea
 __pycache__
+static/session.json

@@ -1,3 +1,5 @@
+import json
+
 import users_session
 from flask import session
 import datetime
@@ -211,23 +213,6 @@ def decode(key, enc):
     )
 
 
-def user_decode(txt):
-    """
-    Decodes a given text using a double decode process with a predefined key and encoded configuration value.
-
-    This function first encodes a predefined configuration value using a key, then decodes the result twice
-    with the same key and the given text.
-
-    Args:
-        txt (str): The text to be decoded.
-
-    Returns:
-        str: The decoded text.
-    """
-    # перевод в нормальный вид
-    return decode(decode('abcd', encode('abcd', config.kirill)), txt)
-
-
 def get_duration(td):
     """
     Converts a time duration in seconds to a human-readable string format.
@@ -306,3 +291,20 @@ def float1000(number, k_round=2):
     st_number = number.split('.')
     st_number[0] = str1000(int(st_number[0]))
     return f"{st_number[0]}.{st_number[1][:2]}" if len(st_number) > 1 else st_number[0]
+
+
+def user_decode(txt):
+    """
+    Decodes a given text using a double decode process with a predefined key and encoded configuration value.
+
+    This function first encodes a predefined configuration value using a key, then decodes the result twice
+    with the same key and the given text.
+
+    Args:
+        txt (str): The text to be decoded.
+
+    Returns:
+        str: The decoded text.
+    """
+    # перевод в нормальный вид
+    return decode(decode('abcd', encode('abcd', config.kirill)), txt)

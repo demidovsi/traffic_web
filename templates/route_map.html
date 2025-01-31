@@ -7,7 +7,7 @@
 <head>
     
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    
+
         <script>
             L_NO_TOUCH = false;
             L_DISABLE_3D = false;
@@ -23,8 +23,10 @@
 <!--        }-->
 <!--    </style>-->
 <!--{% endif %}-->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
@@ -46,11 +48,12 @@
 </head>
 <body style="background: {{colors['background']}}; color: {{colors['black']}};">
 <form method="post" name="{{own}}">
-      <basefont size="5">
+      <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+      <basefont size="6">
       <div class="menu">
           <input type="hidden" name="user_id" value="{{upr['user_id']}}">
           {% include "include/menu2.html" %}
-      </div>
+      </div> <!-- menu -->
       <div class="container-flash">
             <!-- вывести все ошибки анализа ввода -->
           {% for message in get_flashed_messages(with_categories=True) %}
@@ -59,25 +62,24 @@
               {{ message[1] }}
           </div>
           {% endfor %}
-      </div>
-    <div class="points">
+      </div> <!-- container-flash -->
+      <div class="points">
         <p>
             <button type="submit" name="calculate" class="simple-button"
                     style="background: {{colors['lightgray']}}; color: {{colors['red']}}"
                     title="Calculate route">
                 {{txt[2]}}
             </button>
-            {% if par['speedometer'] %}
-                <button name="table" class="simple-text"
-                        style="background: {{colors['background']}}; color: {{colors['blue']}};">
-                    <u>Table</u>
-                </button>
-            {% else %}
-                <button name="speedometer" class="simple-text"
-                        style="background: {{colors['background']}}; color: {{colors['blue']}};">
-                    <u>Riskmeter</u>
-                </button>
-            {% endif %}
+            <select name="select_vid" id="select_vid" style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+                {% for type in par['types'] %}
+                    {% if type == par['select_type'] %}
+                        <option value="{{type}}" selected>{{type}}</option>
+                    {% else %}
+                        <option value="{{type}}">{{type}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
             <span style="colors: {{colors['blue']}}">{{txt[0]}}:</span>
             <input name="start_point" class="search" type="search"
                    style="background: {{colors['background']}}; color: {{colors['black']}}" value="{{par['start_point']}}"
@@ -89,6 +91,11 @@
             <span style="color: {{colors['blue']}};">{{txt[3]}}:</span>
             <input type="datetime-local" name="dt_start" value="{{par['dt_start']}}" required
                    style="background: {{colors['background']}}; color: {{colors['black']}};">
+            {% if par['with_accidents'] %}
+                <input type="checkbox" class="checkbox" name="with_accidents" checked>{{txt[14]}}
+            {% else %}
+                <input type="checkbox" class="checkbox" name="with_accidents">{{txt[14]}}
+            {% endif %}
         </p>
         <p>
             {% if par['dist'] %}
@@ -113,21 +120,19 @@
                 <span style="color: {{colors['blue']}}">av=</span>{{par['av_weight']}})
             {% endif %}
         </p>
-    </div>
-    <!--
-    <div id="user_name">
-        <span style="background: {{colors['background']}}; color: {{colors['black']}}">{{upr['user_name']}}</span>
-    </div>
-    -->
-      <div class="container">
-          {% block content %} {% endblock %}
-      </div>
-            {% if par['speedometer'] and par['coefficient'] %}
-                <div class="data-chart">
-                    <div align="center" style="font-size: 22px">Riskmeter</div>
-                    <canvas id="riskChart"></canvas>
-            {% elif not par['speedometer'] %}
-                <div class="data">
+      </div> <!-- points -->
+      {% if par['select_type'] == 'Riskmeter' and par['coefficient'] %}
+            <div class="data-chart">
+            <div align="center" style="font-size: 22px">Riskmeter</div>
+            <canvas id="riskChart"></canvas>
+            </div> <!-- data-chart -->
+      {% elif par['select_type'] == 'Chart' %}
+            <div class="data-weight">
+                <div align="center"> {{txt[15]}}</div>
+                <canvas id="Chart_weight"></canvas>
+            </div> <!-- data-weight -->
+     {% elif par['select_type'] == 'Table' %}
+            <div class="data">
                 <table id="newsTable" class="table table-sm">
                     <thead  align="center" style="background: {{colors['lightgray']}}; color: {{colors['black']}};">
                         <tr>
@@ -165,12 +170,14 @@
                                     <td><div align="right">{{data['number']}}</div></td>
                                     <td><div align="right">{{data['dt_show']}}</div> </td>
                                     <td>
-                                        {% if data['weight'] %}
-                                            <div align="right">{{data['weight']}}</div>
-                                        {% endif %}
+                                            <div align="right">{{data['weight_0']}}</div>
                                     </td>
-                                    <td><div align="right">{{data['length']}}</div></td>
-                                    <td><div align="right">{{data['way']}}</div></td>
+                                    <td>
+                                        <div align="right">{{data['length']}}</div>
+                                    </td>
+                                    <td>
+                                        <div align="right">{{data['way']}}</div>
+                                    </td>
                                     <td>{{data['district_name_eng']}}</td>
                                     <td><div align="right">{{data['district_weight']}}</div></td>
                                     <td>
@@ -185,10 +192,26 @@
                                     </td>
                                     <td>{{data['speed_limit_weight']}}</td>
     <!--                                <td><div align="right">{{data['road_type_weight']}}</div></td>-->
-                                    <td>{{data['weather_condition']}}</td>
-                                    <td><div align="right">{{data['weather_condition_weight']}}</div></td>
-                                    <td>{{data['road_condition']}}</td>
-                                    <td><div align="right">{{data['road_condition_weight']}}</div></td>
+                                    <td>
+                                        {% if data['weather_condition'] %}
+                                            {{data['weather_condition']}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['weather_condition_weight'] %}
+                                            <div align="right">{{data['weather_condition_weight']}}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['road_condition'] %}
+                                            {{data['road_condition']}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['road_condition_weight'] %}
+                                            <div align="right">{{data['road_condition_weight']}}</div>
+                                        {% endif %}
+                                    </td>
                                     <td>{{data['day_night']}}</td>
                                     <td><div align="right">{{data['day_night_weight']}}</div></td>
                                     <td>{{data['lighting_weight']}}</td>
@@ -202,47 +225,121 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            {% endif %}
-    </div>
+            </div> <!-- data -->
+    {% endif %}
     <div class="switch">
-            {% if not par['speedometer'] %}
-                {% if par['switch'] == 'all_route' %}
-                    <button class="btn-menu-active" name="all_route"
-                            style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
-                        <b>{{txt[7]}}</b>
-                        {% if par['count']%}
-                            ({{par['count']}})
-                        {% endif %}
-                    </button>
-                    <button class="btn-menu" name="accidents"
-                            style="background: {{colors['background']}}; color: {{colors['black']}}">
-                        {{txt[8]}}
-                        {% if par['count_accidents']%}
-                            ({{par['count_accidents']}})
-                        {% endif %}
-                    </button>
-                {% else %}
-                    <button class="btn-menu" name="all_route"
-                            style="background: {{colors['background']}}; color: {{colors['black']}}">
-                        {{txt[7]}}
-                        {% if par['count']%}
-                            ({{par['count']}})
-                        {% endif %}
-                    </button>
-                    <button class="btn-menu-active" name="accidents"
-                            style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
-                        <b>{{txt[8]}}</b>
-                        {% if par['count_accidents']%}
-                            ({{par['count_accidents']}})
-                        {% endif %}
-                    </button>
-                {% endif %}
+        {% if par['select_type'] == 'Table' %}
+            {% if par['switch'] == 'all_route' %}
+                <button class="btn-menu-active" name="all_route"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>{{txt[7]}}</b>
+                    {% if par['count']%}
+                        ({{par['count']}})
+                    {% endif %}
+                </button>
+                <button class="btn-menu" name="accidents"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    {{txt[8]}}
+                    {% if par['count_accidents']%}
+                        ({{par['count_accidents']}})
+                    {% endif %}
+                </button>
+            {% else %}
+                <button class="btn-menu" name="all_route"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    {{txt[7]}}
+                    {% if par['count']%}
+                        ({{par['count']}})
+                    {% endif %}
+                </button>
+                <button class="btn-menu-active" name="accidents"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>{{txt[8]}}</b>
+                    {% if par['count_accidents']%}
+                        ({{par['count_accidents']}})
+                    {% endif %}
+                </button>
             {% endif %}
-    </div>
+        {% endif %}
+    </div> <! switch -->
     <div class="folium-map" id="map_f4ea2d590327241e553f226e8564c166" ></div>
 </form>
 </body>
-{% if par['speedometer'] and par['coefficient'] %}
+
+{% if par['select_type'] == 'Chart' %}
+<script src='/static/js/Chart.js'></script>
+<script>
+        var chartData_weight = {
+            labels : [{% for item in par['value_x'] %}
+                        "{{item}}",
+                      {% endfor %}
+                      ],
+            datasets : [{
+                label: [],
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: ["#3e95cd"],
+                borderColor: "rgba(75,192,192,1)",
+                borderCapStyle: 'butt',
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: 'miter',
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 3,
+                pointHitRadius: 10,
+                data : [
+                    {% for item in par['value_y'] %}
+                        {{item}},
+                    {% endfor %}
+                        ],
+                spanGaps: false
+            }]
+        }
+
+    <!--    get chart canvas-->
+        var ctx_weight = document.getElementById("Chart_weight").getContext("2d");
+        var options_weight =
+        {
+            scales: {
+                x: {
+                    ticks: { fontColor: '{{colors['black']}}'},
+                    {% if upr['theme'] != 'white' %}
+                        gridLines: { color: '{{colors['lightgray']}}'}
+                    {% endif %}
+                },
+                y: {
+                    beginAtZero: false,
+                    ticks: { fontColor: '{{colors['black']}}'},
+                    {% if upr['theme'] != 'white' %}
+                        gridLines: { color: '{{colors['lightgray']}}'}
+                    {% endif %}
+                }
+
+            },
+            legend:{
+                display: false
+            }
+        };
+
+    <!--    create the chart using the chart canvas-->
+        var Chart_weight = new Chart(
+            ctx_weight, {
+                    responsive: false,
+                    type: 'line',
+                    data: chartData_weight,
+                    options: options_weight,
+                 }
+            );
+    </script>
+{% endif %}
+
+{% if par['select_type'] == 'Riskmeter' and par['coefficient'] %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         var oilCanvas = document.getElementById("riskChart");
@@ -293,7 +390,6 @@
             }
           }
         };
-
         var pieChart = new Chart(oilCanvas, {
           type: 'doughnut',
           data: oilData,
@@ -301,155 +397,153 @@
         });
     </script>
 {% endif %}
+
 <script>
-            <!-- определение центральной точки на графике -->
-            var map_f4ea2d590327241e553f226e8564c166 = L.map(
-                "map_f4ea2d590327241e553f226e8564c166",
-                {
-                    {% if par['start_x'] %}
-                        center: [{{(par['start_x'] + par['end_x'])/2}}, {{(par['start_y'] + par['end_y'])/2}}],
-                    {% else %}
-                        center: [],
-                    {% endif %}
-                    crs: L.CRS.EPSG3857,
-                    ...{
-                          "zoom": 9,
-                          "zoomControl": true,
-                          "preferCanvas": false,
-                        }
-
+    <!-- определение центральной точки на графике -->
+    var map_f4ea2d590327241e553f226e8564c166 = L.map(
+        "map_f4ea2d590327241e553f226e8564c166",
+        {
+            {% if par['start_x'] %}
+                center: [{{(par['start_x'] + par['end_x'])/2}}, {{(par['start_y'] + par['end_y'])/2}}],
+            {% else %}
+                center: [],
+            {% endif %}
+            crs: L.CRS.EPSG3857,
+            ...{
+                  "zoom": 9,
+                  "zoomControl": true,
+                  "preferCanvas": false,
                 }
-            );
+        }
+    );
+    var tile_layer_cae6cde8fbfcd30c800e14e41ae66e07 = L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            "minZoom": 0,
+            "maxZoom": 19,
+            "maxNativeZoom": 19,
+            "noWrap": false,
+            "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+            "subdomains": "abc",
+            "detectRetina": false,
+            "tms": false,
+            "opacity": 1,
+        }
+    );
+    tile_layer_cae6cde8fbfcd30c800e14e41ae66e07.addTo(map_f4ea2d590327241e553f226e8564c166);
+    var marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666 = L.marker(
+            {% if par['start_x'] %}
+                [{{par['start_x']}}, {{par['start_y']}}],
+            {% else %}
+                [],
+            {% endif %}
+    ).addTo(map_f4ea2d590327241e553f226e8564c166);
 
-            var tile_layer_cae6cde8fbfcd30c800e14e41ae66e07 = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-                    "minZoom": 0,
-                    "maxZoom": 19,
-                    "maxNativeZoom": 19,
-                    "noWrap": false,
-                    "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-                    "subdomains": "abc",
-                    "detectRetina": false,
-                    "tms": false,
-                    "opacity": 1,
-                }
-            );
-
-            tile_layer_cae6cde8fbfcd30c800e14e41ae66e07.addTo(map_f4ea2d590327241e553f226e8564c166);
-
-            var marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666 = L.marker(
-                    {% if par['start_x'] %}
-                        [{{par['start_x']}}, {{par['start_y']}}],
-                    {% else %}
-                        [],
-                    {% endif %}
-            ).addTo(map_f4ea2d590327241e553f226e8564c166);
-
-            var icon_84b8e3f1ca8851251ae5743c020b4785 = L.AwesomeMarkers.icon(
-                {
-                    "markerColor": "green",
-                    "iconColor": "white",
-                    "icon": "home",
-                    "prefix": "glyphicon",
-                    "extraClasses": "fa-rotate-0",
-                }
-            );
-            marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.setIcon(icon_84b8e3f1ca8851251ae5743c020b4785);
-
-            marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.bindTooltip(
-                `<div>
-                     {{par['start_point']}} {{par['start_xy']}}
-                 </div>`,
-                {
-                      "sticky": true,
-                }
-            );
+    var icon_84b8e3f1ca8851251ae5743c020b4785 = L.AwesomeMarkers.icon(
+        {
+            "markerColor": "green",
+            "iconColor": "white",
+            "icon": "home",
+            "prefix": "glyphicon",
+            "extraClasses": "fa-rotate-0",
+        }
+    );
+    marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.setIcon(icon_84b8e3f1ca8851251ae5743c020b4785);
+    marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.bindTooltip(
+        `<div> {{par['start_point']}} {{par['start_xy']}} </div>`,
+        { "sticky": true, }
+    );
 
 <!-- добавить на карту точки аварий -->
-            var icon_accident = L.AwesomeMarkers.icon(
-                {
-                    "markerColor": "blue",
-                    "icon": "car",
-                    "extraClasses": "fa-class",
-                }
-            );
-            var icon_big_accident = L.AwesomeMarkers.icon(
-                {
-                    "markerColor": "yellow",
-                    "icon": "car",
-                    "extraClasses": "fa-class",
-                }
-            );
+    var icon_accident = L.AwesomeMarkers.icon(
+        {
+            "markerColor": "blue",
+            "icon": "car",
+            "extraClasses": "fa-class",
+        }
+    );
+    var icon_big_accident = L.AwesomeMarkers.icon(
+        {
+            "markerColor": "yellow",
+            "icon": "car",
+            "extraClasses": "fa-class",
+        }
+    );
 
-            {% for data in par['data'] %}
-                {% if data['is_accident'] %}
-                    {% if data['severity'] > 1 %}
-                        L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
-                        setIcon(icon_big_accident).bindTooltip(`<div>
-                        {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km
-                          count={{data['count_accident']}} big_accident={{data['count_big_accident']}}
-                            </div>`,
-                                { "sticky": true, });
-                    {% else %}
-                        L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
-                        setIcon(icon_accident).bindTooltip(`<div>
-                        {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km count={{data['count_accident']}}
-                            </div>`,
-                                { "sticky": true, });
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
+    {% for data in par['data'] %}
+        {% if data['is_accident'] %}
+            {% if data['severity'] > 1 %}
+                L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
+                setIcon(icon_big_accident).bindTooltip(`<div>
+                {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km
+                  count={{data['count_accident']}} big_accident={{data['count_big_accident']}}
+                    </div>`,
+                        { "sticky": true, });
+            {% else %}
+                L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
+                setIcon(icon_accident).bindTooltip(`<div>
+                {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km count={{data['count_accident']}}
+                    </div>`,
+                        { "sticky": true, });
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
-            var marker_d547c9fda8e0eadf27523382b3fba29e = L.marker(
-                    {% if par['end_x'] %}
-                        [{{par['end_x']}}, {{par['end_y']}}],
-                    {% else %}
-                        [],
-                    {% endif %}
-                {
-                }
-            ).addTo(map_f4ea2d590327241e553f226e8564c166);
-        
-    
-            var icon_5ceb0f7235a77422e8861bc11480230c = L.AwesomeMarkers.icon(
-                {
-                    "markerColor": "red",
-                    "iconColor": "white",
-                    "icon": "home",
-                    "prefix": "glyphicon",
-                    "extraClasses": "fa-rotate-0",
-                }
-            );
-            marker_d547c9fda8e0eadf27523382b3fba29e.setIcon(icon_5ceb0f7235a77422e8861bc11480230c);
-        
-    
-            marker_d547c9fda8e0eadf27523382b3fba29e.bindTooltip(
-                `<div>
-                     {{par['end_point']}} {{par['end_xy']}}
-                 </div>`,
-                {
-                    "sticky": true,
-                }
-            );
-
-            var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
-                {{par['locations']}},
-                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue",
-                "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
-                "smoothFactor": 1.0, "stroke": true, "weight": 5}
-            ).addTo(map_f4ea2d590327241e553f226e8564c166);
-        
+    var marker_d547c9fda8e0eadf27523382b3fba29e = L.marker(
+            {% if par['end_x'] %}
+                [{{par['end_x']}}, {{par['end_y']}}],
+            {% else %}
+                [],
+            {% endif %}
+        {
+        }
+    ).addTo(map_f4ea2d590327241e553f226e8564c166);
+    var icon_5ceb0f7235a77422e8861bc11480230c = L.AwesomeMarkers.icon(
+        {
+            "markerColor": "red",
+            "iconColor": "white",
+            "icon": "home",
+            "prefix": "glyphicon",
+            "extraClasses": "fa-rotate-0",
+        }
+    );
+    marker_d547c9fda8e0eadf27523382b3fba29e.setIcon(icon_5ceb0f7235a77422e8861bc11480230c);
+    marker_d547c9fda8e0eadf27523382b3fba29e.bindTooltip(
+        `<div> {{par['end_point']}} {{par['end_xy']}} </div>`,
+        { "sticky": true, }
+    );
+    var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
+        {{par['locations']}},
+        {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue",
+        "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
+        "smoothFactor": 1.0, "stroke": true, "weight": 5}
+    ).addTo(map_f4ea2d590327241e553f226e8564c166);
 </script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-          integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-          crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-          crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf8"
-          src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
+
+<script>
+    {% if par['select_type'] == 'Table' %}
+        const scroller = document.querySelector('.data');
+        const scroll = document.querySelector("#scroll");
+     {% endif %}
+    $(function() {
+        $(document).ready(function () {
+            $('select').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('.checkbox').on('change', function() { document.forms['{{own}}'].submit(); });
+
+        $(function () {
+            $('body').show();
+            {% if par['select_type'] == 'Table' %}
+                    scroller.scrollTop=scroll.value;
+             {% endif %}
+        }); // end ready
+    });
+
+    {% if par['select_type'] == 'Table' %}
+    scroller.addEventListener("scroll", (event) => {
+        scroll.value = scroller.scrollTop;
+            });
+    {% endif %}
+});
+</script>
+
 </html>

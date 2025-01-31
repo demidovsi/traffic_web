@@ -9,6 +9,7 @@ import login as c_login
 import road as c_road
 import big_query
 import language
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(20).hex()
@@ -35,6 +36,8 @@ def login():
 def choose_language(user_id, lang):
     users_session.users.load()
     add(user_id, 'select_language', lang)
+    upr = get(user_id, 'upr')
+    upr['select_language'] = lang
     users_session.users.save()
     return redirect('/road/{user_id}/'.format(user_id=user_id))
 
@@ -54,6 +57,12 @@ def road(user_id):
 common.current_path = os.path.abspath(os.curdir)
 config.kirill = common.decode('abcd', config.kirill)
 users_session.users = users_session.Session()
+
+# print(t0)
+# t1 = common.encode(common.encode('abcd',config.kirill), t0)
+# print(t1)
+# print(decode(config.kirill, t1))
+# print(common.decode(common.encode('abcd', config.kirill), t1))
 
 if __name__ == '__main__':
     if os.path.exists('static/session.json'):

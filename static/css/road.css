@@ -15,7 +15,7 @@ padding-left: 50px;
 .data {
     position: absolute;
     width: 780px;
-    height: 570px;
+    height: 590px;
     top: 120px;
     left: 10px;
     border-style: groove;
@@ -30,6 +30,23 @@ padding-left: 50px;
     left: 10px;
     border: none;
     padding-left: 50px;
+}
+
+.data-weight {
+    position: absolute;
+    width: 780px;
+    height: 590px;
+    top: 150px;
+    left: 10px;
+    border: none;
+    /*border-style: groove;*/
+}
+
+#Chart_weight {
+    width: 780px;
+    height: 480px;
+    border-style: groove;
+    border: none;
 }
 
 .simple-text {
@@ -104,4 +121,8 @@ th, td {
 
 .fa-class {
     font-size: 12px;
+}
+
+#select_vid {
+    border: none;
 }
