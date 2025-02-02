@@ -119,7 +119,7 @@ pip install -r requirements.txt
 
 ### 🔹 Running the Application
 ```bash
-python app.py
+python main_traffic.py
 ```
 
 ---
