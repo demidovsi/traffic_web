@@ -300,26 +300,36 @@ def dop_points(answer):
     road_condition = None
     road_condition_weight = None
     for i, data in enumerate(answer['data']):
-        if 'accident' in data:
-            data['weather_condition'] = data['accident']['weather_condition']
-            data['weather_condition_weight'] = data['accident']['weather_condition_weight']
-        else:
+        define_day_week(answer, i)
+        if 'accident' not in data:  # это не аварийная точка
             if 'weather_condition' in data:
                 weather_condition = data['weather_condition']
                 weather_condition_weight = 79 if weather_condition == 'Clear' else 3
             data['weather_condition'] = weather_condition
             data['weather_condition_weight'] = weather_condition_weight
-
-        if 'accident' in data:
-            data['road_condition'] = data['accident']['road_condition']
-            data['road_condition_weight'] = data['accident']['road_condition_weight']
-        else:
             if 'road_condition' in data:
                 road_condition = data['road_condition']
                 road_condition_weight = 81 if road_condition == 'Dry' else 4
             data['road_condition'] = road_condition
             data['road_condition_weight'] = road_condition_weight
-        define_day_week(answer, i)
+        good = ('accident' in data and data['day_night'] == data['accident']['day_night'] and
+                data['day_of_week'] == data['accident']['day_of_week_name'])
+        if good:  # авария и она подходит по времени суток и дню недели
+            data['weather_condition'] = data['accident']['weather_condition']
+            data['weather_condition_weight'] = data['accident']['weather_condition_weight']
+            data['road_condition'] = data['accident']['road_condition']
+            data['road_condition_weight'] = data['accident']['road_condition_weight']
+    road_condition_weight = None
+    weather_condition_weight = None
+    for i, data in enumerate(answer['data']):
+        if 'road_condition_weight' in data and data['road_condition_weight'] is not None:
+            road_condition_weight = data['road_condition_weight']
+        if 'weather_condition_weight' in data and data['weather_condition_weight'] is not None:
+            weather_condition_weight = data['weather_condition_weight']
+        if 'road_condition_weight' not in data or data['road_condition_weight'] is None:
+            data['road_condition_weight'] = road_condition_weight
+        if 'weather_condition_weight' not in data or data['weather_condition_weight'] is None:
+            data['weather_condition_weight'] = weather_condition_weight
 
 
 def analyses_request(answer, request):
@@ -383,6 +393,9 @@ def create_data(answer):
             'count_big_accident': 0,
             'dt_show': datetime.datetime.fromtimestamp(dt + int(answer['sec_route'])).strftime('%H:%M:%S'),
             'x': round(point[0], k_dig), 'y': round(point[1], k_dig), 'way': round(answer['dist'], 3)})
+    answer['dist'] = str(round(answer['dist'], 1)) if answer['dist'] else ''  # общее расстояние
+    answer['time'] = common.get_duration(answer['sec_route']) if answer['sec_route'] else ''  # время движения
+    answer['count'] = len(answer['data'])
     print('изготовление таблицы data', 'время=', time.time() - t0)
 
 
@@ -398,7 +411,8 @@ def load_accidents(answer):
         query += "('{x}', '{y}')".format(x=x, y=y)
     if query:
         query = ('select * from {schema}.traffic.accident_analysis where '
-                 '(longitude_str, latitude_str) IN UNNEST([{query}]);').format(schema=big_query.catalog, query=query)
+                 '(longitude_str, latitude_str) IN UNNEST([{query}]) order by year_accident;').format(
+            schema=big_query.catalog, query=query)
         t0 = time.time()
         is_ok, ans_big = big_query.execute_script(query)
         print('чтение из big-query', 'получено строк=', len(ans_big), 'время=', time.time() - t0)
@@ -439,12 +453,7 @@ def prepare_form(user_id, request):
     if len(answer['data']) == 0:
         create_data(answer)  # создать таблицу data
         load_weather(answer)  # загрузить погоду
-        answer['dist'] = str(round(answer['dist'],1)) if answer['dist'] else ''  # общее расстояние
-        answer['time'] = common.get_duration(answer['sec_route']) if answer['sec_route'] else ''  # время движения
-        answer['count'] = len(answer['data'])
-        load_accidents(answer)
-    for data in answer['data']:
-        data['show'] = True if answer['switch'] == 'all_route' or 'is_accident' in data and data['is_accident'] else False
+        load_accidents(answer)  # загрузить аварии
     if len(answer['locations']) > 0:
         dop_points(answer)  # дополнительные точки по погоде и дню недели
         calc_weight(answer)  # рассчитать сумму весов и общий вес
@@ -455,6 +464,8 @@ def prepare_form(user_id, request):
         answer['empty_coefficient'] = max(0, answer['value_green'] + answer['value_yellow'] + answer['value_red'] -
                                       answer['coefficient'])
         answer['weight'] = common.float1000(round(answer['weight'], 1))
+    for data in answer['data']:
+        data['show'] = True if answer['switch'] == 'all_route' or 'is_accident' in data and data['is_accident'] else False
     if answer['select_type'] == 'Chart':
         make_chart(answer)
     common.save_form(user_id, array_default, answer, 'road_')
