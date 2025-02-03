@@ -60,17 +60,17 @@ If a route point has accident data:
 If a point has no accident data, default weights are assigned:
 | Condition         | Weight |
 |------------------|--------|
-| **Weather** (Clear) | 79 |
-| **Weather** (Rainy) | 3 |
-| **Road** (Dry) | 81 |
-| **Road** (Wet) | 4 |
-| **Sunday** | 17 |
-| **Monday** | 15 |
-| **Tuesday** | 16 |
-| **Wednesday** | 15 |
-| **Thursday** | 16 |
-| **Friday** | 14 |
-| **Saturday** | 9 |
+| **Weather** 
+| **Weather** 
+| **Road**
+| **Road** 
+| **Sunday** 
+| **Monday** 
+| **Tuesday** 
+| **Wednesday** 
+| **Thursday**
+| **Friday** 
+| **Saturday** 
 
 ---
 
