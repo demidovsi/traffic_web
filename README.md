@@ -1,4 +1,4 @@
-# 🚦 Traffic_Web: Travel Risk Assessment Web Application test
+# 🚦 Traffic_Web: Travel Risk Assessment Web Application
 
 **Traffic_Web** is a web application designed to **assess travel risks** for a given route. The risk assessment considers factors such as **weather conditions, past accident data, and road conditions** to calculate a risk coefficient, helping users make informed travel decisions.
 
