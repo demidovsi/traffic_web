@@ -131,10 +131,11 @@
       </div> <!-- points -->
       {% if par['select_type'] == 'Riskmeter' and par['coefficient'] %}
             <div class="data-chart">
-            <div align="center" style="font-size: 22px">Riskmeter</div>
-            <canvas id="riskChart"></canvas>
+                <div align="center" style="font-size: 22px">Riskmeter</div>
+                <canvas id="riskChart"></canvas>
+                <div class="result_risk" align="center" style="font-size: 22px">{{txt[13]}} =  {{txt[par['result_risk']]}}</div>
             </div> <!-- data-chart -->
-      {% elif par['select_type'] == 'Chart' %}
+      {% elif 'Chart' in par['select_type'] %}
             <div class="data-weight">
                 <div align="center"> {{txt[15]}}</div>
                 <canvas id="Chart_weight"></canvas>
@@ -167,6 +168,9 @@
                             <th id="th_x" scope="col" title="Latitude">y</th>
                             <th id="th_y" scope="col" title="Longitude">x</th>
                             <th id="th_severity" scope="col" title="severity">S</th>
+                            <th id="th_count_accident" scope="col" title="count accidents">cnt acd</th>
+                            <th id="th_count_big_accident" scope="col" title="count big accidents">cnt big acd</th>
+                            <th id="th_count_own_accident" scope="col" title="count own accidents">cnt own acd</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -174,9 +178,9 @@
                     <tbody>
                         {% for data in par['data'] %}
                             {% if data['show'] %}
-                                {% if data['severity'] == 20 %}
+                                {% if data['count_own_accident'] and data['count_big_accident'] %}
                                     <tr style="color: {{colors['red']}};">
-                                {% elif data['severity'] == 1 %}
+                                {% elif data['count_own_accident'] %}
                                     <tr style="color: {{colors['blue']}};">
                                 {% else %}
                                     <tr style="color: {{colors['black']}};">
@@ -184,7 +188,7 @@
                                     <td><div align="right">{{data['number']}}</div></td>
                                     <td><div align="right">{{data['dt_show']}}</div> </td>
                                     <td>
-                                            <div align="right">{{data['weight_0']}}</div>
+                                        <div align="right">{{data['weight_0']}}</div>
                                     </td>
                                     <td>
                                         <div align="right">{{data['length']}}</div>
@@ -205,31 +209,6 @@
                                         {% endif %}
                                     </td>
                                     <td>{{data['speed_limit_weight']}}</td>
-                                    <td><div align="right">{{data['number']}}</div></td>
-                                    <td><div align="right">{{data['dt_show']}}</div> </td>
-                                    <td>
-                                            <div align="right">{{data['weight_0']}}</div>
-                                    </td>
-                                    <td>
-                                        <div align="right">{{data['length']}}</div>
-                                    </td>
-                                    <td>
-                                        <div align="right">{{data['way']}}</div>
-                                    </td>
-                                    <td>{{data['district_name_eng']}}</td>
-                                    <td><div align="right">{{data['district_weight']}}</div></td>
-                                    <td>
-                                        <div align="right">
-                                            {{data['speed']}}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if data['speed_limit'] %}
-                                            {{data['speed_limit']}}
-                                        {% endif %}
-                                    </td>
-                                    <td>{{data['speed_limit_weight']}}</td>
-    <!--                                <td><div align="right">{{data['road_type_weight']}}</div></td>-->
                                     <td>
                                         {% if data['weather_condition'] %}
                                             {{data['weather_condition']}}
@@ -257,7 +236,26 @@
                                     <td><div align="right">{{data['day_of_week_weight']}}</div></td>
                                     <td><div align="right">{{data['x']}}</div></td>
                                     <td><div align="right">{{data['y']}}</div></td>
-                                    <td><div align="right">{{data['severity']}}</div></td>
+                                    <td>
+                                        {% if data['severity'] %}
+                                            <div align="right">{{data['severity']}}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['count_accident'] %}
+                                            <div align="right">{{data['count_accident']}}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['count_big_accident'] %}
+                                            <div align="right">{{data['count_big_accident']}}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if data['count_own_accident'] %}
+                                            <div align="right">{{data['count_own_accident']}}</div>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -304,7 +302,7 @@
 </form>
 </body>
 
-{% if par['select_type'] == 'Chart' %}
+{% if 'Chart' in par['select_type'] %}
 <script src='/static/js/Chart.js'></script>
 <script>
         var chartData_weight = {
@@ -511,17 +509,16 @@
 
         {% for data in par['data'] %}
             {% if data['is_accident'] %}
-                {% if data['severity'] > 1 %}
+                {% if 'big_accident_in_point' in data %}
                     L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
                     setIcon(icon_big_accident).bindTooltip(`<div>
-                    {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km
-                      count={{data['count_accident']}} big_accident={{data['count_big_accident']}}
+                        {{data['tooltip_accident']}}
                         </div>`,
                             { "sticky": true, });
                 {% else %}
                     L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
                     setIcon(icon_accident).bindTooltip(`<div>
-                    {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km count={{data['count_accident']}}
+                        {{data['tooltip_accident']}}
                         </div>`,
                             { "sticky": true, });
                 {% endif %}

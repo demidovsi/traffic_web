@@ -126,3 +126,6 @@ th, td {
 #select_vid {
     border: none;
 }
+.tooltip-inner {
+    white-space: pre-wrap;
+}

@@ -10,7 +10,7 @@ import big_query
 import meteo
 
 types = [
-    'Table', 'Riskmeter', 'Chart'
+    'Table', 'Riskmeter', 'Chart coeff', 'Chart weight'
 ]
 
 array_default = [
@@ -185,6 +185,9 @@ def load_weather(answer):
 
 
 def make_data_accident(answer, ans_big):
+    def slave(key):
+        data[key] = data[key] + unit[key] if key in data else unit[key]
+
     count = 0
     if 'begin_day' in answer and answer['begin_day']:
         begin_day = datetime.datetime.fromtimestamp(answer['begin_day']).hour
@@ -198,34 +201,35 @@ def make_data_accident(answer, ans_big):
                 data['is_accident'] = True
                 data['count_accident'] += 1
                 data['speed_limit'] = unit['speed_limit']
-                data['speed_limit_weight'] = unit['speed_limit_weight']
                 data['district_name_eng'] = unit['district_name_eng']
-                data['district_weight'] = unit['district_weight']
-                if unit['severity'] > 1:
-                    data['count_big_accident'] += 1
-                data['severity'] = max(unit['severity'], data['severity'])
-
-                if 'weather_condition' in data and data['weather_condition'] == unit['weather_condition']:
-                    data['weather_condition_weight'] = unit['weather_condition_weight']
-
-                if 'road_condition' in data and data['road_condition'] == unit['road_condition']:
-                    data['road_condition_weight'] = unit['road_condition_weight']
-
-                data['district_weight'] = unit['district_weight']
-
                 dt = datetime.datetime.fromtimestamp(data['dt'])
                 day_night = 'Day' if  begin_day <= dt.hour < begin_night else 'Night'
-                if day_night == unit['day_night']:
-                    data['day_night_weight'] = unit['day_night_weight']
-                    data['day_night'] = day_night
-
                 day_week = dt.strftime("%A")
-                if day_week == unit['day_of_week_name']:
-                    data['day_of_week_weight'] = unit['day_of_week_weight']
-                    data['day_of_week'] = day_week
-                # data['lighting_weight'] = unit['lighting_weight']
-                data['accident'] = unit
+                data['day_night'] = day_night
+                data['day_of_week'] = day_week
+                if unit['severity'] > 1:
+                    data['big_accident_in_point'] = True
+
+                is_need = 'weather_condition' in data and data['weather_condition'] == unit['weather_condition'] and \
+                    'road_condition' in data and data['road_condition'] == unit['road_condition'] and \
+                    day_night == unit['day_night'] and day_week == unit['day_of_week_name']
+                if is_need:  # подходящая авария
+                    if unit['severity'] > 1:
+                        data['count_big_accident'] += 1
+                    data['count_own_accident'] += 1
+                    slave('speed_limit_weight')
+                    slave('district_weight')
+                    slave('severity')
+                    slave('weather_condition_weight')
+                    slave('road_condition_weight')
+                    slave('district_weight')
+                    slave('day_night_weight')
+                    slave('day_of_week_weight')
+                    data['accident'] = unit
                 count += 1
+    for data in answer['data']:
+        if 'speed_limit_weight' in data:
+            data['speed_limit_weight'] = round(data['speed_limit_weight'], 1)
     return count
 
 
@@ -390,7 +394,7 @@ def create_data(answer):
         answer['data'].append({
             'number': i + 1, 'length': round(s, 3), 'time': t, 'dt': dt + int(answer['sec_route']),
             'speed': round(average_speed, 1), 'severity': 0, 'count_accident': 0,
-            'count_big_accident': 0,
+            'count_big_accident': 0, 'count_own_accident': 0, 'is_accident': False,
             'dt_show': datetime.datetime.fromtimestamp(dt + int(answer['sec_route'])).strftime('%H:%M:%S'),
             'x': round(point[0], k_dig), 'y': round(point[1], k_dig), 'way': round(answer['dist'], 3)})
     answer['dist'] = str(round(answer['dist'], 1)) if answer['dist'] else ''  # общее расстояние
@@ -425,18 +429,40 @@ def load_accidents(answer):
             flash(ans_big, 'warning')
 
 
-def make_chart(answer):
+def make_chart(answer, key='coeff'):
     answer['value_x'] = []
     answer['value_y'] = []
+    time_way = 0
     for i in range(len(answer['data'])):
-        weight = 0
-        time_way = 0
-        for j in range(i + 1):
-            weight += answer['data'][j]['weight']
-            time_way += answer['data'][j]['time']
-        answer['value_x'].append(common.get_duration(time_way).strip())
-        weight = round(weight / time_way / 60, 3)
-        answer['value_y'].append(weight)
+        if key == 'coeff':
+            time_way = 0
+            weight = 0
+            for j in range(i + 1):
+                weight += answer['data'][j]['weight']
+                time_way += answer['data'][j]['time']
+            weight = round(weight / time_way / 60, 3)
+            answer['value_x'].append(common.get_duration(time_way).strip())
+            answer['value_y'].append(weight)
+        else:
+            time_way += answer['data'][i]['time']
+            answer['value_x'].append(common.get_duration(time_way).strip())
+            answer['value_y'].append(answer['data'][i]['weight_0'])
+
+
+def make_tooltip_accident(answer):
+    for data in answer['data']:
+        if data['is_accident']:
+            if data['count_own_accident']:
+                data['tooltip_accident'] =  ("{number} ({x} - {y}) {way} km\n"
+                                             "acc={count} big={big_accident}").format(
+                    number=data['number'], x=data['x'], y=data['y'], way=data['way'], count=data['count_accident'],
+                    big_accident=data['count_big_accident'])
+                if data['count_own_accident']:
+                    data['tooltip_accident'] += " calc={accident_calc}".format(
+                        accident_calc= data['count_own_accident'])
+            else:
+                data['tooltip_accident'] = "{number} {x} - {y} {way} km acc={count}".format(
+                    number=data['number'], x=data['x'], y=data['y'], way=data['way'], count=data['count_accident'])
 
 
 def prepare_form(user_id, request):
@@ -464,10 +490,19 @@ def prepare_form(user_id, request):
         answer['empty_coefficient'] = max(0, answer['value_green'] + answer['value_yellow'] + answer['value_red'] -
                                       answer['coefficient'])
         answer['weight'] = common.float1000(round(answer['weight'], 1))
+        if answer['coefficient'] <= answer['value_green']:
+            answer['result_risk'] = 10
+        elif answer['coefficient'] <= answer['value_yellow'] + answer['value_yellow']:
+            answer['result_risk'] = 11
+        else:
+            answer['result_risk'] = 12
+        make_tooltip_accident(answer)
     for data in answer['data']:
         data['show'] = True if answer['switch'] == 'all_route' or 'is_accident' in data and data['is_accident'] else False
-    if answer['select_type'] == 'Chart':
+    if answer['select_type'] == 'Chart coeff':
         make_chart(answer)
+    if answer['select_type'] == 'Chart weight':
+        make_chart(answer, 'weight')
     common.save_form(user_id, array_default, answer, 'road_')
     print('weathers', 'count=', len(answer['weathers']), 'запросов погоды=', answer['count_weather'])
     return answer
