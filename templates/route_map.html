@@ -33,6 +33,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+          integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
 
     <link rel="stylesheet" type="text/css" href="/static/css/road.css">
     <link rel="shortcut icon" href="/static/motorway.png" >
@@ -164,7 +174,37 @@
                     <tbody>
                         {% for data in par['data'] %}
                             {% if data['show'] %}
-                                <tr style="color: {{colors['black']}};">
+                                {% if data['severity'] == 20 %}
+                                    <tr style="color: {{colors['red']}};">
+                                {% elif data['severity'] == 1 %}
+                                    <tr style="color: {{colors['blue']}};">
+                                {% else %}
+                                    <tr style="color: {{colors['black']}};">
+                                {% endif %}
+                                    <td><div align="right">{{data['number']}}</div></td>
+                                    <td><div align="right">{{data['dt_show']}}</div> </td>
+                                    <td>
+                                            <div align="right">{{data['weight_0']}}</div>
+                                    </td>
+                                    <td>
+                                        <div align="right">{{data['length']}}</div>
+                                    </td>
+                                    <td>
+                                        <div align="right">{{data['way']}}</div>
+                                    </td>
+                                    <td>{{data['district_name_eng']}}</td>
+                                    <td><div align="right">{{data['district_weight']}}</div></td>
+                                    <td>
+                                        <div align="right">
+                                            {{data['speed']}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if data['speed_limit'] %}
+                                            {{data['speed_limit']}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{data['speed_limit_weight']}}</td>
                                     <td><div align="right">{{data['number']}}</div></td>
                                     <td><div align="right">{{data['dt_show']}}</div> </td>
                                     <td>
@@ -396,127 +436,129 @@
     </script>
 {% endif %}
 
-<script>
-    <!-- определение центральной точки на графике -->
-    var map_f4ea2d590327241e553f226e8564c166 = L.map(
-        "map_f4ea2d590327241e553f226e8564c166",
-        {
-            {% if par['start_x'] %}
-                center: [{{(par['start_x'] + par['end_x'])/2}}, {{(par['start_y'] + par['end_y'])/2}}],
-            {% else %}
-                center: [],
-            {% endif %}
-            crs: L.CRS.EPSG3857,
-            ...{
-                  "zoom": 9,
-                  "zoomControl": true,
-                  "preferCanvas": false,
-                }
-        }
-    );
-    var tile_layer_cae6cde8fbfcd30c800e14e41ae66e07 = L.tileLayer(
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            "minZoom": 0,
-            "maxZoom": 19,
-            "maxNativeZoom": 19,
-            "noWrap": false,
-            "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-            "subdomains": "abc",
-            "detectRetina": false,
-            "tms": false,
-            "opacity": 1,
-        }
-    );
-    tile_layer_cae6cde8fbfcd30c800e14e41ae66e07.addTo(map_f4ea2d590327241e553f226e8564c166);
-    var marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666 = L.marker(
-            {% if par['start_x'] %}
-                [{{par['start_x']}}, {{par['start_y']}}],
-            {% else %}
-                [],
-            {% endif %}
-    ).addTo(map_f4ea2d590327241e553f226e8564c166);
+{% if par['locations'] %}
+    <script>
+        <!-- определение центральной точки на графике -->
+        var map_f4ea2d590327241e553f226e8564c166 = L.map(
+            "map_f4ea2d590327241e553f226e8564c166",
+            {
+                {% if par['start_x'] %}
+                    center: [{{(par['start_x'] + par['end_x'])/2}}, {{(par['start_y'] + par['end_y'])/2}}],
+                {% else %}
+                    center: [],
+                {% endif %}
+                crs: L.CRS.EPSG3857,
+                ...{
+                      "zoom": 9,
+                      "zoomControl": true,
+                      "preferCanvas": false,
+                    }
+            }
+        );
+        var tile_layer_cae6cde8fbfcd30c800e14e41ae66e07 = L.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                "minZoom": 0,
+                "maxZoom": 19,
+                "maxNativeZoom": 19,
+                "noWrap": false,
+                "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+                "subdomains": "abc",
+                "detectRetina": false,
+                "tms": false,
+                "opacity": 1,
+            }
+        );
+        tile_layer_cae6cde8fbfcd30c800e14e41ae66e07.addTo(map_f4ea2d590327241e553f226e8564c166);
+        var marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666 = L.marker(
+                {% if par['start_x'] %}
+                    [{{par['start_x']}}, {{par['start_y']}}],
+                {% else %}
+                    [],
+                {% endif %}
+        ).addTo(map_f4ea2d590327241e553f226e8564c166);
 
-    var icon_84b8e3f1ca8851251ae5743c020b4785 = L.AwesomeMarkers.icon(
-        {
-            "markerColor": "green",
-            "iconColor": "white",
-            "icon": "home",
-            "prefix": "glyphicon",
-            "extraClasses": "fa-rotate-0",
-        }
-    );
-    marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.setIcon(icon_84b8e3f1ca8851251ae5743c020b4785);
-    marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.bindTooltip(
-        `<div> {{par['start_point']}} {{par['start_xy']}} </div>`,
-        { "sticky": true, }
-    );
+        var icon_84b8e3f1ca8851251ae5743c020b4785 = L.AwesomeMarkers.icon(
+            {
+                "markerColor": "green",
+                "iconColor": "white",
+                "icon": "home",
+                "prefix": "glyphicon",
+                "extraClasses": "fa-rotate-0",
+            }
+        );
+        marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.setIcon(icon_84b8e3f1ca8851251ae5743c020b4785);
+        marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.bindTooltip(
+            `<div> {{par['start_point']}} {{par['start_xy']}} </div>`,
+            { "sticky": true, }
+        );
 
-<!-- добавить на карту точки аварий -->
-    var icon_accident = L.AwesomeMarkers.icon(
-        {
-            "markerColor": "blue",
-            "icon": "car",
-            "extraClasses": "fa-class",
-        }
-    );
-    var icon_big_accident = L.AwesomeMarkers.icon(
-        {
-            "markerColor": "yellow",
-            "icon": "car",
-            "extraClasses": "fa-class",
-        }
-    );
+    <!-- добавить на карту точки аварий -->
+        var icon_accident = L.AwesomeMarkers.icon(
+            {
+                "markerColor": "blue",
+                "icon": "car",
+                "extraClasses": "fa-class",
+            }
+        );
+        var icon_big_accident = L.AwesomeMarkers.icon(
+            {
+                "markerColor": "yellow",
+                "icon": "car",
+                "extraClasses": "fa-class",
+            }
+        );
 
-    {% for data in par['data'] %}
-        {% if data['is_accident'] %}
-            {% if data['severity'] > 1 %}
-                L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
-                setIcon(icon_big_accident).bindTooltip(`<div>
-                {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km
-                  count={{data['count_accident']}} big_accident={{data['count_big_accident']}}
-                    </div>`,
-                        { "sticky": true, });
-            {% else %}
-                L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
-                setIcon(icon_accident).bindTooltip(`<div>
-                {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km count={{data['count_accident']}}
-                    </div>`,
-                        { "sticky": true, });
+        {% for data in par['data'] %}
+            {% if data['is_accident'] %}
+                {% if data['severity'] > 1 %}
+                    L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
+                    setIcon(icon_big_accident).bindTooltip(`<div>
+                    {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km
+                      count={{data['count_accident']}} big_accident={{data['count_big_accident']}}
+                        </div>`,
+                            { "sticky": true, });
+                {% else %}
+                    L.marker([{{data['x']}}, {{data['y']}}]).addTo(map_f4ea2d590327241e553f226e8564c166).
+                    setIcon(icon_accident).bindTooltip(`<div>
+                    {{data['number']}} ({{data['x']}} - {{data['y']}}) {{data['way']}} km count={{data['count_accident']}}
+                        </div>`,
+                            { "sticky": true, });
+                {% endif %}
             {% endif %}
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
 
-    var marker_d547c9fda8e0eadf27523382b3fba29e = L.marker(
-            {% if par['end_x'] %}
-                [{{par['end_x']}}, {{par['end_y']}}],
-            {% else %}
-                [],
-            {% endif %}
-        {
-        }
-    ).addTo(map_f4ea2d590327241e553f226e8564c166);
-    var icon_5ceb0f7235a77422e8861bc11480230c = L.AwesomeMarkers.icon(
-        {
-            "markerColor": "red",
-            "iconColor": "white",
-            "icon": "home",
-            "prefix": "glyphicon",
-            "extraClasses": "fa-rotate-0",
-        }
-    );
-    marker_d547c9fda8e0eadf27523382b3fba29e.setIcon(icon_5ceb0f7235a77422e8861bc11480230c);
-    marker_d547c9fda8e0eadf27523382b3fba29e.bindTooltip(
-        `<div> {{par['end_point']}} {{par['end_xy']}} </div>`,
-        { "sticky": true, }
-    );
-    var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
-        {{par['locations']}},
-        {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue",
-        "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
-        "smoothFactor": 1.0, "stroke": true, "weight": 5}
-    ).addTo(map_f4ea2d590327241e553f226e8564c166);
-</script>
+        var marker_d547c9fda8e0eadf27523382b3fba29e = L.marker(
+                {% if par['end_x'] %}
+                    [{{par['end_x']}}, {{par['end_y']}}],
+                {% else %}
+                    [],
+                {% endif %}
+            {
+            }
+        ).addTo(map_f4ea2d590327241e553f226e8564c166);
+        var icon_5ceb0f7235a77422e8861bc11480230c = L.AwesomeMarkers.icon(
+            {
+                "markerColor": "red",
+                "iconColor": "white",
+                "icon": "home",
+                "prefix": "glyphicon",
+                "extraClasses": "fa-rotate-0",
+            }
+        );
+        marker_d547c9fda8e0eadf27523382b3fba29e.setIcon(icon_5ceb0f7235a77422e8861bc11480230c);
+        marker_d547c9fda8e0eadf27523382b3fba29e.bindTooltip(
+            `<div> {{par['end_point']}} {{par['end_xy']}} </div>`,
+            { "sticky": true, }
+        );
+        var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
+            {{par['locations']}},
+            {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue",
+            "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
+            "smoothFactor": 1.0, "stroke": true, "weight": 5}
+        ).addTo(map_f4ea2d590327241e553f226e8564c166);
+    </script>
+{% endif %}
 
 <script>
     {% if par['select_type'] == 'Table' %}
@@ -543,16 +585,4 @@
     {% endif %}
 });
 </script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-          integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-          crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-          crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf8"
-          src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
-</
 </html>
