@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Лента новостей
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/news.css">
+<form method="post" name="{{own}}">
+    <input type="hidden" id="timezone" name="user_id" value="">
+    <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+    <div class="top">
+        <span style="font-size:18px; font-weight: bold; color: {{colors['green']}};"> {{par['title']}} </span>
+        всего новостей=<span style="color: {{colors['green']}};"> {{par['global_count']}}</span>
+        <div class="interval">
+            {% if par['switch'] == 'all_days' %}
+                <button class="btn-menu-active" name="all_days"
+                        title="Информация за весь период наблюдения"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>Вся информация</b>
+                </button>
+                <button class="btn-menu" name="one_day"
+                        title="Информация за выбранные сутки"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    Одни сутки
+                </button>
+            {% else %}
+                <button class="btn-menu" name="all_days"
+                        title="Информация за весь период наблюдения"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    Вся информация
+                </button>
+                <button class="btn-menu-active" name="one_day"
+                        title="Информация за выбранные сутки"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>Одни сутки</b>
+                </button>
+            {% endif %}
+            {% if par['switch'] == 'one_day' %}
+                    {% include "include/dates.html" %}
+            {% endif %}
+        </div> <!-- interval -->
+        <div class="filter">
+            Тема=
+            <select name="select_theme" id="select_theme"
+                    style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+                {% for theme in par['themes'] %}
+                    {% if theme['id'] == par['select_theme'] %}
+                        <option value="{{theme['id']}}" selected>{{theme['sh_name']}}</option>
+                    {% else %}
+                        <option value="{{theme['id']}}">{{theme['sh_name']}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            Новостной сайт=
+            <select name="select_rss" id="select_rss"
+                    style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+                {% for rss in par['list_rss'] %}
+                    {% if rss['id'] == par['select_rss'] %}
+                        <option value="{{rss['id']}}" selected>{{rss['sh_name']}}</option>
+                    {% else %}
+                        <option value="{{rss['id']}}">{{rss['sh_name']}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            Язык=
+            <select name="select_lang" id="select_lang"
+                    title="Язык текста в таблице новостей"
+                    style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+                {% for lang in par['languages'] %}
+                    {% if lang == par['select_lang'] %}
+                        <option value="{{lang}}" selected>{{lang}}</option>
+                    {% else %}
+                        <option value="{{lang}}">{{lang}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div> <!-- filter -->
+        <p> {% include "include/top_of_table.html" %} </p>
+    </div> <!-- top -->
+    <div class="bottom">
+        <div class="data">
+            <table id="newsTable" class="table table-sm table-condensed">
+                <thead  align="center" style="background: {{colors['lightgray']}}; color: {{colors['black']}};">
+                    <tr>
+                        <th id="th_id" scope="col" title="ID новости">ID</th>
+                        <th id="th_public_date" scope="col" title="Время и дата">Время и дата</th>
+                        <th id="th_title" scope="col" title="Заголовок новости">Заголовок</th>
+                        <th id="th_description" scope="col" title="Текст новости">Новость</th>
+                        <th id="th_theme" scope="col" title="Тема поисковых образов">Тема</th>
+                        <th id="th_rss" scope="col" title="Название новостного сайта">Сайт</th>
+                        <th id="th_author" scope="col" title="Источник новости">Автор</th>
+                        <th id="th_file" scope="col" title="Длина файла">Файл</th>
+                        <th id="th_lang" scope="col" title="Язык сайта">Язык</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                </tfoot>
+                <tbody>
+                    {% for data in par['data'] %}
+                        <tr style="color: {{colors['black']}};">
+                            <td>
+                                <div align="right">
+                                    <button class="simple-text" name="id_{{data['id']}}"
+                                            title="Полная информация по новости"
+                                            style="background: {{colors['background']}}; color: {{colors['blue']}};">
+                                        <u>{{data['id']}}</u>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                {% if data['at_date_time'] %}
+                                    {{moment(data['at_date_time']).format(par['format_dt'])}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if data['error_translator'] %}
+                                    <span style="color: {{colors['red']}};">{{data['title']}}</span>
+                                {% else %}
+                                    {{data['title']}}
+                                {% endif %}
+                            </td>
+                            <td>{{data['description']}}</td>
+                            <td>{{data['name_theme']}}</td>
+                            <td>{{data['name_rss']}}</td>
+                            <td>
+                                {% if data['author'] %}
+                                    {{data['author']}}
+                                {% endif %}
+                            </td>
+                            <td>{{data['file']}}</td>
+                            <td>{{data['lang']}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> <!-- data -->
+        <div class="pages">
+            {% include "include/pages_table.html" %}
+        </div>
+    </div> <!-- bottom -->
+</form>
+{% endblock %}
+
+{% block scripts %}
+      {{super()}}
+      {{ moment.include_moment()}}
+      {{ moment.lang('ru') }}
+  <script>
+        const scroller = document.querySelector('.datas');
+        const scroll = document.querySelector("#scroll")
+    $(function() {
+        $(document).ready(function () {
+            $('#combobox').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#start').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#page_number').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('select').on('change', function() { document.forms['{{own}}'].submit(); });
+
+            {% if par['page'] == 1 %}
+                setTimeout(
+                  () => {document.forms['news'].submit();}, 60*1000
+                );
+            {% endif %}
+
+            $(function () {
+                $('body').show();
+                scroller.scrollTop=scroll.value;
+            }); // end ready
+        });
+
+        scroller.addEventListener("scroll", (event) => {
+            scroll.value = scroller.scrollTop;
+                });
+    });
+  </script>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Лог работы
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/logs.css">
+<form method="post" name="{{own}}">
+    <input type="hidden" id="timezone" name="user_id" value="">
+    <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+    <div class="top">
+        <div class="top1">
+            <span style="font-size:18px; font-weight: bold; color: {{colors['green']}};"> {{par['title']}} </span>
+            {% if par['switch'] == 'all_days' %}
+                <button class="btn-menu" name="all_days"
+                        title="Информация всего лога"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>Вся информация</b>
+                </button>
+            {% else %}
+                <button class="btn-menu" name="all_days"
+                        title="Информация всего лога"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    Вся информация
+                </button>
+            {% endif %}
+
+            {% if par['switch'] == 'one_day' %}
+                <button class="btn-menu" name="one_day"
+                        title="Информация за выбранные сутки"
+                        style="background: {{colors['lightgray']}}; color: {{colors['green']}}">
+                    <b>Выбранные сутки</b>
+                </button>
+            {% else %}
+                <button class="btn-menu" name="one_day"
+                        title="Информация за выбранные сутки"
+                        style="background: {{colors['background']}}; color: {{colors['black']}}">
+                    Выбранные сутки
+                </button>
+            {% endif %}
+
+            {% if par['switch'] == 'one_day' %}
+                    {% include "include/dates.html" %}
+            {% endif %}
+        </div>
+        <p> {% include "include/top_of_table.html" %} </p>
+    </div>
+    <div class="datas">
+        <table id="logsTable" class="table table-striped table-bordered table-condensed">
+            <thead align="center" style="background: {{colors['lightgray']}}; color: {{colors['black']}};">
+                <tr>
+                    <th id="th_time" scope="col">Time</th>
+                    <th id="th_operation" scope="col">Operation</th>
+                    <th id="th_source" scope="col">Source</th>
+                    <th id="th_td" scope="col">TD</th>
+                    <th id="th_page" scope="col">Page/Count</th>
+                    <th id="th_law_id" scope="col">Name/ID</th>
+                    <th id="th_comment" scope="col">Comment/Server</th>
+                    <th id="th_message" scope="col">Message</th>
+                </tr>
+            </thead>
+            <tfoot>
+            </tfoot>
+            <tbody>
+                {% for data in par['data'] %}
+                    <tr style="color: {{colors['black']}};">
+                        <td>{{moment(data['at_date_time']).format(par['format_dt'])}}</td>
+                        <td>
+                            {% if 'Error' in data['level'] or 'error' in data['level'] or 'ERROR' in data['level'] or 'Exception' in data['level'] %}
+                                <b><span style="color: {{colors['red']}}">{{data['level']}}</span></b>
+                            {% elif 'Debug' in data['level'] or 'debug' in data['level'] %}
+                                <b><span style="color: {{colors['blue']}}">{{data['level']}}</span></b>
+                            {% elif 'Request' in data['level'] or 'request' in data['level'] %}
+                                <b><span style="color: {{colors['green']}}">{{data['level']}}</span></b>
+                            {% else %}
+                                {{data['level']}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{data['source']}}
+                        </td>
+                        <td>
+                            <div align="right">
+                                {% if data['td'] %}
+                                    {{data['td']}}
+                                {% else %}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div align="right">
+                                {% if data['page'] %}
+                                    {{data['page']}}
+                                {% else %}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {{data['law_id']}}
+                        </td>
+                        <td>
+                            <textarea style="background: {{colors['background']}}; color: {{colors['black']}};"
+                                      readonly class="file_name">{{data['file_name']}}</textarea>
+                        </td>
+                        <td>
+                            {% if par['short_format'] %}
+                                {% if 'Ошибка' in data['comment']  or 'ошибка' in data['comment'] or 'Error' in data['level'] or
+                                    'error' in data['level']  or 'ERROR' in data['level'] or 'Exception' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['red']}};"
+                                              readonly class="comment_short">{{data['comment']}}</textarea>
+                                {% elif 'Debug' in data['level'] or 'debug' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['blue']}};"
+                                              readonly class="comment_short">{{data['comment']}}></textarea>
+                                {% elif 'Request' in data['request'] or 'request' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['green']}};"
+                                              readonly class="comment_short">{{data['comment']}}</textarea>
+                                {% else %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['black']}};"
+                                              readonly class="comment_short">{{data['comment']}}</textarea>
+                                {% endif %}
+                            {% else %}
+                                {% if 'Ошибка' in data['comment']  or 'ошибка' in data['comment'] or 'Error' in data['level'] or
+                                    'error' in data['level']  or 'ERROR' in data['level'] or 'Exception' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['red']}};"
+                                              readonly class="comment">{{data['comment']}}</textarea>
+                                {% elif 'Debug' in data['level'] or 'debug' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['blue']}};"
+                                              readonly class="comment">{{data['comment']}}></textarea>
+                                {% elif 'Request' in data['request'] or 'request' in data['level'] %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['green']}};"
+                                              readonly class="comment">{{data['comment']}}</textarea>
+                                {% else %}
+                                    <textarea style="background: {{colors['background']}}; color: {{colors['black']}};"
+                                              readonly class="comment">{{data['comment']}}</textarea>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> <!-- datas -->
+    <div class="pages"> {% include "include/pages_table.html" %} </div>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+      {{super()}}
+      {{ moment.include_moment()}}
+      {{ moment.lang('ru') }}
+  <script>
+        const scroller = document.querySelector('.datas');
+        const scroll = document.querySelector("#scroll")
+    $(function() {
+        $(document).ready(function () {
+          $('#do_update').on('change', function() { document.forms['{{own}}'].submit(); });
+          $('#combobox').on('change', function() { document.forms['{{own}}'].submit(); });
+          $('#start').on('change', function() { document.forms['{{own}}'].submit(); });
+          $('#page_number').on('change', function() { document.forms['{{own}}'].submit(); });
+          $('#row_count').on('change', function() { document.forms['{{own}}'].submit(); });
+
+        $(function () {
+            $('body').show();
+            scroller.scrollTop=scroll.value;
+        }); // end ready
+
+        {% if par['page'] == 1 %}
+            setTimeout(
+              () => {document.forms['{{own}}'].submit();}, 30*1000
+            );
+        {% endif %}
+
+        });
+        scroller.addEventListener("scroll", (event) => {
+            scroll.value = scroller.scrollTop;
+                });
+    });
+  </script>
+
+{% endblock %}

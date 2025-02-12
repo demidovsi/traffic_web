@@ -1,0 +1,315 @@
+input {
+    accent-color: auto;
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+}
+
+input{accent-color: rebeccapurple;}
+input:not(:checked){opacity: 0.9;}
+input[type=checkbox]{transform:scale(1.2); margin:0px 0px 0px;}
+
+.simple-text {
+    border: none;
+}
+
+.container-flash {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    width: 500px;
+    z-index: 100;
+}
+
+thead {  /* для всех таблиц фиксируем заголовок */
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  top: -3px;
+}
+
+.thead_black{
+    background: #696969;
+    color: white;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  z-index: 1;
+}
+
+.thead_white{
+    background: #F0F8FF;
+    color: black;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+}
+
+.container {
+    padding-top: 50px;
+    margin: 10px;
+    overflow:auto;
+    width: 100%;
+}
+
+#user_name {
+    position: absolute;
+    top: 0px;
+    right: 0;
+    padding-right: 10px;
+}
+
+.menu {
+    position: absolute;
+    float: top;
+    top: 0px;
+    height: 50px;
+}
+
+body {
+    display: none;
+}
+
+table {
+    line-height: 1;
+    /*box-shadow: 2px 2px gray;*/
+}
+
+p {
+    line-height: 1;
+}
+
+select {
+    background: white;
+    border-radius: 7px;
+    height: 30px; /* Высота */
+}
+
+.current {
+   background-color: lightblue;
+   color: black;
+    -moz-border-radius:  10px; /* Firefox */
+    -webkit-border-radius:  10px; /* Safari 4 */
+    border-radius:  10px; /* IE 9, Safari 5, Chrome */
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
+    height: 30px; /* Высота */
+    box-shadow: 2px 2px gray;
+}
+
+.now {
+    -moz-border-radius:  10px; /* Firefox */
+    -webkit-border-radius:  10px; /* Safari 4 */
+    border-radius:  10px; /* IE 9, Safari 5, Chrome */
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
+    height: 30px; /* Высота */
+    box-shadow: 2px 2px gray;
+}
+
+.button-refresh, .btn-show {
+   /*background-color: yellow;*/
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    border-radius: 7px;
+    height: 30px; /* Высота */
+    padding-left: 10px;
+    padding-right: 10px;
+    box-shadow: 2px 2px gray;
+}
+
+.button-save {
+    background: white; /* Цвет фона */
+    background: #E0FFFF; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    width: 150px; /* Ширина кнопки */
+    height: 35px; /* Высота */
+    border-radius: 25px;
+}
+
+.button-load-document {
+    padding: 5px 5px;
+    border: 1px solid #7a7b7e;
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+.button_law {
+    padding: 10px 10px;
+    background: white;
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    border: 1px solid blue; /* Параметры рамки */
+    height: 35px;
+    box-shadow: 2px 2px gray;
+}
+
+.button-amendment {
+    border: 1px solid green; /* Параметры рамки */
+    padding: 5px 10px;
+    width: 60px; /* Ширина кнопки */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+button:hover {
+    background-color: yellow; /* Цвет фона */
+    color: blue;
+}
+
+.btn_amendment {
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    width: 50px; /* Ширина кнопки */
+    height: 30px; /* Высота */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+.btn_law {
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+    margin-top: 10px;
+    margin-left: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.btn_pz {
+    background: yellow; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    width: 60px; /* Ширина кнопки */
+    height: 30px; /* Высота */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+    color: blue;
+}
+
+.btn-back {
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 30px; /* Высота */
+    border-radius: 15px;
+    box-shadow: 2px 2px green;
+}
+
+.button-file {
+    padding: 10px 10px;
+    min-width: 200px;
+    background: lightyellow; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    border: 1px solid blue; /* Параметры рамки */
+    box-shadow: 2px 2px gray;
+}
+
+.button-file-simple {
+    padding: 5px 5px;
+    min-width: 200px;
+    background: lightyellow; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    border: 1px solid blue; /* Параметры рамки */
+    border-radius: 10px;
+    box-shadow: 2px 2px gray;
+}
+
+.button_radius {
+    background: white; /* Цвет фона */
+    background: #E0FFFF; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    width: 30px; /* Ширина кнопки */
+    height: 35px; /* Высота */
+    border-radius: 25px;
+    filter: sepia(100%);
+    -webkit-filter: sepia(100%);
+}
+
+.btn_radius {
+    background: white; /* Цвет фона */
+    background: #E0FFFF; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    height: 35px; /* Высота */
+    border-radius: 25px;
+    filter: sepia(100%);
+    -webkit-filter: sepia(100%);
+}
+
+.button_excel_all {
+    padding: 5px 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    height: 35px; /* Высота */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+.button_excel {
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    height: 35px; /* Высота */
+    border-radius: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+.button_lr {
+    background: #E0FFFF; /* Цвет фона */
+    background: white; /* Цвет фона */
+    border: 1px solid #7a7b7e; /* Параметры рамки */
+    width: 30px; /* Ширина кнопки */
+    height: 30px; /* Высота */
+    border-radius: 25px;
+    box-shadow: 2px 2px gray;
+}
+
+/* для date и иконки на темном фоне */
+.sd-container {
+  position: relative;
+  float: left;
+}
+
+.sd {
+  padding: 5px 10px;
+  height: 30px;
+  width: 140px;
+}
+
+.open-button {
+  position: absolute;
+  top: 2px;
+  right: 10px;
+  width: 25px;
+  height: 25px;
+  background: #fff;
+  pointer-events: none;
+}
+
+.open-button button {
+  border: none;
+  background: transparent;
+}
+/* ---------------------------*/
+
+.btn-menu {
+    border: none;
+    border: 1px solid #808080;
+    height: 30px;
+}
+
+.btn-menu-active {
+    border: 1px solid green;
+    height: 30px;
+}
+
+.top1 {
+    padding: 5px;
+}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Параметры сервисов
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/functions.css" xmlns="http://www.w3.org/1999/html">
+<form method="post" name="{{own}}">
+    <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+    <p>
+        <button class="simple-text" name="refresh"
+                style="background: {{colors['background']}}; color: {{colors['black']}};"
+                title="Отменить все сделанные изменения">
+            <span style="background: {{colors['background']}}; color: {{colors['green']}};"><u>Восстановить</u></span>
+        </button>
+        <font size="4">
+            <b><span style="color: {{colors['black']}};">Управление -</span>
+                <span style="color: {{colors['green']}};">Параметры потоков сервиса подкачки </span>
+            </b>
+        </font>
+        <button class="simple-text" name="save"
+                style="background: {{colors['background']}}; color: {{colors['blue']}};"
+                title="Записать информацию в базу данных">
+            <img src="/static/write_db.png" width="18" height="16">
+            <span style="background: {{colors['background']}}; color: {{colors['red']}};"><u>Записать</u></span>
+        </button>
+    </p>
+    <div class="new_function">
+        Сервис:  Ident=<input id="name_function" name="name_function" type="search"
+                              value="{{par['name_function']}}"
+                     style="background: {{colors['background']}}; color: {{colors['black']}}" >
+        Description=<input id="description_function" name="description_function" type="search"
+                           value="{{par['description_function']}}"
+                           style="background: {{colors['background']}}; color: {{colors['black']}}">
+        <button class="simple-text" name="save_function"
+                style="background: {{colors['background']}}; color: {{colors['black']}}"
+                title="Записать информацию по сервису (или создать новый)">
+            <img src="/static/write_db.png" width="18" height="16">
+        </button>
+        {% if par['id_function'] %}
+            <button class="simple-text" name="delete_service"
+                    style="background: {{colors['background']}}; color: {{colors['black']}}"
+                    title="Удалить сервис и все его параметры">
+                <img src="/static/delete.png" width="18" height="16">
+            </button>
+        {% endif %}
+    </div> <!-- new_function -->
+    <div class="new_parameter">
+        Параметр:  Сервис=
+            <select name="select_function" id="select_function" style="background: {{colors['background']}}; color: {{colors['color_combobox']}};" title="Сервис параметра">
+                {% for data in par['functions'] %}
+                    {% if data['id'] == par['function_parameter'] %}
+                        <option value="{{data['id']}}" selected>{{data['sh_name']}}</option>
+                    {% else %}
+                        <option value="{{data['id']}}">{{data['sh_name']}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        Code=<input type="search" id="code_parameter" name="code_parameter" value="{{par['code_parameter']}}"
+                    style="background: {{colors['background']}}; color: {{colors['black']}}" title="Код параметра">
+        Число=
+        {% if par['is_number_parameter'] %}
+            <input type="checkbox" name="is_number_parameter" value="{{par['is_number_parameter']}}" checked
+                   title="Признак величина параметра число или строка">
+        {% else %}
+            <input type="checkbox" name="is_number_parameter" value="{{par['is_number_parameter']}}"
+                   title="Признак величина параметра число или строка">
+        {% endif %}
+        Комм=<input type="search" name="comment_parameter" value="{{par['comment_parameter']}}" id="comment_parameter"
+                    style="background: {{colors['background']}}; color: {{colors['black']}}"
+                    title="Комментарий к параметру сервиса">
+        <button class="simple-text" name="save_parameter"
+                style="background: {{colors['background']}}; color: {{colors['black']}}"
+                title="Записать информацию по параметру сервиса (или создать новый)">
+            <img src="/static/write_db.png" width="18" height="16">
+        </button>
+        {% if par['id_parameter'] %}
+            <button class="simple-text" name="delete_parameter"
+                    style="background: {{colors['background']}}; color: {{colors['black']}}"
+                    title="Удалить параметр сервиса">
+                <img src="/static/delete.png" width="18" height="16">
+            </button>
+        {% endif %}
+    </div> <!-- new_parameter -->
+    <div class="function_params" style="line-height: 1em; overflow: auto;"
+         style="background: {{colors['background']}}; color: {{colors['black']}};">
+            <table id="lawsTable" class="table table-striped table-hover table-bordered table-condensed">
+                <thead align="center" class="thead_{{upr['theme']}}">
+                    <tr>
+                        <th id="th_source" scope="col" title="Дата регистрации законопроекта в ГД РФ">Сервис</th>
+                        <th id="th_value" scope="col" title="Номер законопроекта в ГД РФ">Значение</th>
+                        <th id="th_comment" scope="col" title="Номер законопроекта в ГД РФ">Комментарий</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit in par['data'] %}
+                    <tr>
+                        <td>
+                            <button class="simple-text" name="corr_function~{{unit['name_function']}}"
+                                style="background: {{colors['background']}}; color: {{colors['red']}}"
+                                title="Корректировать информацию по сервису">
+                                <u>{{unit['name_function']}} </u>
+                            </button>
+                            {% if unit['name_function'] %}
+                                <span style="background: {{colors['background']}}; color: {{colors['lightgray']}};">
+                                    ({{unit['description'][0:100]}})
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if unit['is_number'] == 1 %}
+                                <input type="number" class="number" name="{{unit['id']}}" value="{{unit['value']}}" title="Числовое значение параметра"
+                                       style="background: {{colors['background']}}; color: {{colors['black']}};">
+                            {% else %}
+                                <input type="text" class="text" name="{{unit['id']}}" value="{{unit['value']}}" title="Текстовое значение параметра"
+                                       style="background: {{colors['background']}}; color: {{colors['black']}};">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="simple-text" name="corr_parameter~{{unit['id']}}"
+                                style="background: {{colors['background']}}; color: {{colors['blue']}}"
+                                title="Корректировать информацию по параметру">
+                                <span style="background: {{colors['background']}}; color: {{colors['blue']}};">
+                                    <u>{{unit['sh_name']}}</u>
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+        {% endfor %}
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+        const scroller = document.querySelector('.function_params');
+        const scroll = document.querySelector("#scroll")
+    $(function() {
+        $(document).ready(function () {
+          $('.name_function').on('change', function() { document.forms['{{own}}'].submit(); });
+
+          $(function () {
+            $('body').show();
+            scroller.scrollTop=scroll.value;
+          }); // end ready
+
+        });
+        scroller.addEventListener("scroll", (event) => {
+            scroll.value = scroller.scrollTop;
+                });
+    });
+  </script>
+
+{% endblock %}

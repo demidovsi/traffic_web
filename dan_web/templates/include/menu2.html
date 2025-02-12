@@ -1,0 +1,23 @@
+<header>
+    <div class="dws_menu">
+    <nav class="dws-menu">
+        <ul>
+            <li><a href="#">Новости</a>
+                <ul>
+                    <li><a href="{{url_for('news', user_id=upr['user_id'])}}">Лента новостей</a></li>
+                </ul>
+            </li>
+            {% if upr['admin'] %}
+                <li><a href="#">Сайт</a>
+                    <ul>
+                        <li><a href="{{url_for('logs', user_id=upr['user_id'])}}">Log</a></li>
+                        <li><a href="{{url_for('functions', user_id=upr['user_id'])}}">Параметры сервисов</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+            <li><a href="{{url_for('login')}}">Login</a></li>
+        </ul>
+    </nav>
+    </div>
+</header>
+<link rel="stylesheet" type="text/css" href="/static/css/menu2.css">

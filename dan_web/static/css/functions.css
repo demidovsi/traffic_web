@@ -1,0 +1,74 @@
+
+.button-action-white {
+    height: 35px;
+    border-radius: 15px;
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(lightgreen), to(#FFFFFF));
+    background: white;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-shadow: 2px 2px gray;
+}
+
+.function_params {
+    width: 1000px;
+    height: 75vh;
+    padding-right: 10px;
+    border-style: groove;
+    border: none;
+    margin: 20px;
+}
+
+p {
+    margin: 5px;
+}
+
+.number {
+    width: 80px;
+    border: none;
+    /*border: 1px solid blue; /* Параметры рамки */
+}
+
+.text {
+    width: 300px;
+    border-radius: 10px;
+    border: none;
+    /*border: 1px solid red; /* Параметры рамки */*/
+    background:	#FFE4C4;
+}
+
+#description_function {
+    width: 600px;
+}
+
+#name_function {
+    width: 150px;
+}
+
+#code_parameter {
+    width: 150px;
+}
+
+#comment_parameter {
+    width: 350px;
+}
+
+.label{
+    width: 120px;
+}
+
+table {
+    line-height: 1.1;
+    box-shadow: 2px 2px gray;
+}
+
+#lawsTable {
+    width: 970px;
+}
+
+#th_source {width: 300px;}
+#th_value {width: 200px;}
+#th_comment {width: 480px;}
+
+.new_parameter {
+    padding-top: 10px;
+}

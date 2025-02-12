@@ -1,0 +1,47 @@
+.interval, .filter {
+    padding-top: 5px;
+}
+
+.top {
+    position: absolute;
+    top: 50px;
+}
+
+.bottom {
+    position: absolute;
+    top: 200px;
+    height: 600px;
+    border: 1px solid green;
+    border: none;
+}
+
+.pages {
+    position: absolute;
+    padding-left: 50px;
+    top: 670px;
+    width: 1000px;
+}
+
+.data {
+    position: absolute;
+    padding-top: 5px;
+    width: 1500px;
+    height: 650px;
+    border: none;
+    overflow:auto;
+}
+
+#newsTable {
+    border-collapse: collapse; /* Убираем двойные линии между ячейками */
+    border: none;
+}
+
+#th_id {width: 80px;}
+#th_title {width: 400px;}
+#th_description1 {width: 300px;}
+#th_rss {width: 100px;}
+#th_theme {width: 100px;}
+#th_author {width: 100px;}
+#th_public_date {width: 120px;}
+#th_file {width: 80px;}
+#th_lang {width: 60px;}

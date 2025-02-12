@@ -1,0 +1,134 @@
+{
+    "b48ac8ea4a6b1c4534c7780743dfd7f209e44831": {
+        "app_lang": "ru",
+        "city": "",
+        "country": "",
+        "expires": 5339344024.0,
+        "lang": "",
+        "log_do_update": true,
+        "log_page": 1,
+        "log_row_count": 100,
+        "log_scroll": 0,
+        "log_search": "",
+        "log_st_date": "2025-02-12",
+        "log_switch": "one_day",
+        "news_count": 8,
+        "news_format_dt": "HH:mm:ss D.M.Y",
+        "news_global_count": "499",
+        "news_languages": [
+            "ru",
+            "en",
+            "he"
+        ],
+        "news_list_rss": [
+            {
+                "id": 0,
+                "lang": "",
+                "sh_name": ""
+            },
+            {
+                "id": 7,
+                "lang": "ru",
+                "sh_name": "incrypted.com"
+            },
+            {
+                "id": 6,
+                "lang": "ru",
+                "sh_name": "bits_media"
+            },
+            {
+                "id": 5,
+                "lang": "ru",
+                "sh_name": "Twobitcoins"
+            },
+            {
+                "id": 4,
+                "lang": "ru",
+                "sh_name": "Beincrypto"
+            },
+            {
+                "id": 3,
+                "lang": "ru",
+                "sh_name": "forklog.com"
+            },
+            {
+                "id": 2,
+                "lang": "ru",
+                "sh_name": "ru-crypto.com"
+            },
+            {
+                "id": 1,
+                "lang": "ru",
+                "sh_name": "news.mail.ru"
+            }
+        ],
+        "news_page": 1,
+        "news_row_count": 10,
+        "news_scroll": 0,
+        "news_search": "",
+        "news_select_lang": "ru",
+        "news_select_rss": 0,
+        "news_select_theme": 0,
+        "news_st_date": "2025-02-12",
+        "news_switch": "one_day",
+        "news_themes": [
+            {
+                "id": 0,
+                "sh_name": "",
+                "value": ""
+            },
+            {
+                "_delete": false,
+                "id": 1,
+                "sh_name": "Без поисковых образов",
+                "value": ""
+            },
+            {
+                "_delete": false,
+                "id": 2,
+                "sh_name": "Инфляция",
+                "value": "инфляция;\r\nденежно кредитная политика;\r\n^ДКП^;\r\nминимальный размер оплаты труда;\r\n^МРОТ^;"
+            },
+            {
+                "_delete": false,
+                "id": 3,
+                "sh_name": "Криптовалюта",
+                "value": "криптовалюта;\r\nкриптовалюте;\r\nкриптовалюты;\r\nбиткоин;\r\nбиткоины;"
+            }
+        ],
+        "rights": "admin,visible",
+        "select_group": "",
+        "theme": "black",
+        "time_zone": 2,
+        "token": {
+            "***": "visible, admin",
+            "expires": "2139-03-14 01:07:04",
+            "user": "superadmin"
+        },
+        "upr": {
+            "admin": true,
+            "colors": {
+                "background": "black",
+                "black": "white",
+                "black2": "black",
+                "blue": "lightblue",
+                "color_combobox": "yellow",
+                "color_select": "white",
+                "dark_violet": "cyan",
+                "green": "lightgreen",
+                "light_blue": "lightblue",
+                "lightgray": "#696969",
+                "red": "Wheat",
+                "salmon": "salmon",
+                "yellow": "yellow"
+            },
+            "schema": null,
+            "theme": "black",
+            "time_zone": 2,
+            "user_id": "b48ac8ea4a6b1c4534c7780743dfd7f209e44831",
+            "user_name": "demidovsi@gmail.com"
+        },
+        "user_address": "demidovsi@gmail.com; 127.0.0.1; system=\"Windows\"  ",
+        "user_name": "demidovsi@gmail.com"
+    }
+}

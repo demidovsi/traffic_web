@@ -1,0 +1,74 @@
+#logsTable {
+    width: 1400px;
+    border-collapse: collapse; /* Убираем двойные линии между ячейками */
+    border: none;
+}
+
+.top {
+    /*float:left;*/
+    height: 120px;
+    overflow:auto;
+}
+
+.datas {
+    /*float:left;*/
+    position: absolute;
+    top: 160px;
+    height: 75vh;
+    border: none;
+    overflow:auto;
+}
+
+.pages {
+    /*float:left;*/
+    position: absolute;
+    height: 5vh;
+    margin: 10px;
+    padding-left: 100px;
+    top: 92vh;
+}
+
+textarea {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-left: 2px;
+    line-height: 1;
+    text-indent: 0em;
+    padding: 5px;
+    display: inline-table;
+}
+
+.comment_short {
+    border: none;
+    resize: none;
+    width: 600px;
+}
+
+.comment {
+    border: none;
+    resize: none;
+    width: 430px;
+}
+
+.file_name {
+    border: none;
+    resize: none;
+    width: 250px;
+}
+
+body {
+    font-family:Verdana;
+    font-size:14px;
+}
+
+.container {
+    margin: 10px;
+}
+
+#th_time {width: 130px;}
+#th_operation {width: 150px;}
+#th_source {width: 145px;}
+#th_td {width: 120px;}
+#th_page {width: 90px;}
+#th_law_id {width: 150px;}
+#th_comment {width: 270px;}
