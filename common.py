@@ -308,3 +308,10 @@ def user_decode(txt):
     """
     # перевод в нормальный вид
     return decode(decode('abcd', encode('abcd', config.kirill)), txt)
+
+
+def choose_language(user_id, request):
+    if 'select_language' in request.form:
+        upr = get(user_id, 'upr')
+        upr['select_language'] = request.form.get('select_language')
+        add(user_id, 'upr', upr)

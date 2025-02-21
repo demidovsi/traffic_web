@@ -1,25 +1,34 @@
 {
     "de": {
+        "menu": [
+            "Mögliche Schnittstellensprachen",
+            "Route"
+        ],
         "road": [
-            "Ausgangspunkt",
-            "Endpunkt",
-            "Route berechnen",
-            "Zeit Ereignis",
+            "Der Ausgangspunkt",
+            "Der letzte Punkt",
+            "Berechnen Sie die Route",
+            "Startzeit",
             "Entfernung km",
-            "Reisezeit",
+            "Routenzeit",
             "Gesamtgewicht",
-            "Alle Wegpunkte",
-            "Nur Unfallpunkte",
+            "Alle Punkte der Route",
+            "Nur Unfälle Punkte",
             "Koeffizient",
             "Sicher",
             "Aufmerksamkeit",
             "Notfall",
-            "Reiseprognose",
-            "Berücksichtigung von Unfällen",
-            "Verteilung der Koeffizienten entlang der Route"
+            "Reisevorhersage",
+            "Unter Berücksichtigung von Unfällen",
+            "Routenkoeffizientenverteilung",
+            "Nicht verwendete Unfälle"
         ]
     },
     "en": {
+        "menu": [
+            "Possible interface languages",
+            "Route"
+        ],
         "road": [
             "Starting point",
             "End point",
@@ -36,70 +45,104 @@
             "Emergency",
             "Trip Forecast",
             "Taking into account accidents",
-            "Distribution of coefficients along the route"
+            "Distribution of coefficients along the route",
+            "Unused accidents",
+            "The fastest",
+            "The shortest",
+            "Recommended",
+            "Calculate again",
+            "Indication of the type of calculated information",
+            "The assignment of the starting point of the route",
+            "Task of the final point of the route",
+            "Task Time for the beginning of the movement along the route",
+            "Preference",
+            "The choice of quantitative preference for the route",
+            "The number of alternatives",
+            "Task of the number of alternative routes (1-3)",
+            "Alternative calculation",
+            "Indicating the route number for which there will be information calculation"
         ]
     },
     "es": {
+        "menu": [
+            "Posibles idiomas de interfaz",
+            "Ruta"
+        ],
         "road": [
-            "Punto de partida",
-            "Punto final",
-            "Calcular ruta",
+            "El punto de partida",
+            "El punto final",
+            "Calcular la ruta",
             "Hora de inicio",
             "Distancia km",
-            "tiempo de viaje",
+            "Tiempo de ruta",
             "Peso total",
-            "Todos los puntos de referencia",
-            "Solo puntos de accidente",
+            "Todos los puntos de la ruta",
+            "Solo puntos de accidentes",
             "Coeficiente",
-            "Seguro",
+            "Sin peligro",
             "Atención",
             "Emergencia",
-            "Pronóstico del viaje",
+            "Pronóstico de viajes",
             "Teniendo en cuenta los accidentes",
-            "Distribución de coeficientes a lo largo del recorrido"
+            "Distribución de coeficientes de ruta",
+            "No se usan accidentes"
         ]
     },
     "fr": {
+        "menu": [
+            "Langues d'interface possibles",
+            "Itinéraire"
+        ],
         "road": [
-            "Point de départ",
-            "Point final",
-            "Calculer l'itinéraire",
+            "Le point de départ",
+            "Le dernier point",
+            "Calculez l'itinéraire",
             "Heure de début",
             "Distance km",
-            "Temps de trajet",
+            "Heure d'itinéraire",
             "Poids total",
-            "Tous les points de cheminement",
-            "Seuls les points d'accident",
+            "Tous les points de l'itinéraire",
+            "Seuls les points d'accidents",
             "Coefficient",
-            "Sûr",
+            "Sans risque",
             "Attention",
             "Urgence",
             "Prévisions de voyage",
-            "Prise en compte des accidents",
-            "Répartition des coefficients le long du parcours"
+            "En tenant compte des accidents",
+            "Distribution des coefficients d'itinéraire",
+            "Accidents non utilisés"
         ]
     },
     "he": {
+        "menu": [
+            "שפות ממשק אפשריות",
+            "מַסלוּל"
+        ],
         "road": [
-            "נקודת מוצא",
-            "נקודת סיום",
-            "חשב מסלול",
-            "שעת התחלה",
+            "נקודת המוצא",
+            "הנקודה הסופית",
+            "חשב את המסלול",
+            "זמן התחלה",
             "מרחק ק\"מ",
-            "זמן נסיעה",
+            "זמן מסלול",
             "משקל כולל",
-            "כל נקודות הציון",
-            "רק נקודות תאונה",
+            "כל נקודות המסלול",
+            "רק נקודות תאונות",
             "מְקַדֵם",
-            "כַּסֶפֶת",
+            "בְּבִטחָה",
             "תְשׁוּמַת לֵב",
             "חֵרוּם",
-            "תחזית טיול",
-            "תוך התחשבות בתאונות",
-            "התפלגות המקדמים לאורך המסלול"
+            "תחזית נסיעות",
+            "לוקחים בחשבון תאונות",
+            "חלוקת מקדם מסלול",
+            "לא נעשה שימוש בתאונות"
         ]
     },
     "ru": {
+        "menu": [
+            "Возможные языки интерфейса",
+            "Маршрут"
+        ],
         "road": [
             "Начальная точка",
             "Конечная точка",
@@ -111,32 +154,52 @@
             "Все точки маршрута",
             "Только точки аварий",
             "Коэффициент",
-            "Безопасный",
+            "Безопасно",
             "Внимание",
-            "Чрезвычайная ситуация",
+            "Аварийно",
             "Прогноз на поездку",
             "С учетом аварий",
-            "Распределение коэффициентов по маршруту"
+            "Распределение коэффициентов по маршруту",
+            "Не использованные аварии",
+            "Самый быстрый",
+            "Самый короткий",
+            "Рекомендованный",
+            "Рассчитать повторно",
+            "Указание вида расчетной информации",
+            "Задание начальной точки маршрута",
+            "Задание конечной точки маршрута",
+            "Задание время начала движения по маршруту",
+            "Предпочтение",
+            "Выбор количественного предпочтения для маршрута",
+            "Количество альтернатив",
+            "Задание количества альтернативных маршрутов (1-3)",
+            "Расчет по альтернативе",
+            "Указание номера маршрута для которого будет расчет информации"
         ]
     },
     "zh-CN": {
+        "menu": [
+            "可能的接口语言",
+            "路线"
+        ],
         "road": [
             "起点",
-            "终点",
+            "最后一点",
             "计算路线",
             "开始时间",
-            "距离 公里",
-            "旅行时间",
+            "距离公里",
+            "路线时间",
             "总重量",
-            "所有航点",
-            "仅限事故积分",
+            "路线的所有点",
+            "只有事故点",
             "系数",
-            "安全的",
+            "安全",
             "注意力",
             "紧急情况",
-            "行程预测",
-            "考虑到事故",
-            "沿路线的系数分布"
+            "旅行预测",
+            "考虑事故",
+            "路线系数分布",
+            "未使用事故"
         ]
     }
 }

@@ -7,15 +7,21 @@ import folium
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import big_query
+import config
 import meteo
+import language
 
 types = [
-    'Table', 'Riskmeter', 'Chart coeff', 'Chart weight'
+    'Table', 'Riskmeter', 'Chart coeff', 'Chart weight', 'Accident not used'
 ]
+
+colors = ['green', 'red', 'blue']
 
 array_default = [
     {'key': 'dt_start', 'value': common.st_now_hour()},
+    {'key': 'dt_start_init', 'value': common.st_now_hour()},
     {'key': 'start_point', 'value': 'Bat Yam'},
+    {'key': 'start_point_init', 'value': 'Bat Yam'},
     {'key': 'start_x', 'value': None},
     {'key': 'start_y', 'value': None},
     {'key': 'start_xy', 'value': ''},
@@ -23,10 +29,13 @@ array_default = [
     {'key': 'end_x', 'value': None},
     {'key': 'end_y', 'value': None},
     {'key': 'end_point', 'value': 'Tel-Aviv'},
+    {'key': 'end_point_init', 'value': 'Tel-Aviv'},
     {'key': 'locations', 'value': []},
     {'key': 'weathers', 'value': []},
     {'key': 'dist', 'value': None},
     {'key': 'data', 'value': []},
+    {'key': 'not_used', 'value': []},
+    {'key': 'count_not_used', 'value': 0},
     {'key': 'time', 'value': ''},
     {'key': 'sec_route', 'value': 0},
     {'key': 'begin_day', 'value': None},  # начало дня
@@ -44,12 +53,24 @@ array_default = [
     {'key': 'select_type', 'value': 'Riskmeter'},  # тип левой части
     {'key': 'with_accidents', 'value': True},  # учитывать аварии на маршруте
     {'key': 'scroll', 'value': 0},  # смещение в таблице
+    {'key': 'route', 'value': {}},  # маршруты
+    {'key': 'select_preference', 'value': 17},  # маршруты
+    {'key': 'select_preference_init', 'value': 17},  # маршруты
+    {'key': 'select_route', 'value': 1},  # номер альтернативного маршрута для расчета риска
+    {'key': 'select_route_init', 'value': 1},  # номер альтернативного маршрута для расчета риска
+    {'key': 'count_routes', 'value': 1},  # количество альтернатив
+    {'key': 'count_routes_init', 'value': 1},  # количество альтернатив
+    {'key': 'count_weather', 'value': 0},  # количество запросов погоды
+    {'key': 'need_route', 'value': False},  # признак необходимости загрузки маршрутов
+    {'key': 'need_calc', 'value': False},  # признак необходимости расчета выбранного маршрута
+    {'key': 'zoom', 'value': 13},  # для расстояний менее 15 км
+    {'key': 'first_calc', 'value': 2},  # номер начального текста расчета
 ]
 api_key = "5b3ce3597851110001cf62480ae97b5b07b24a2daeaa55007d357cec"
 k_dig = 4
 
 # Define a function to calculate the route using OpenRouteService
-def calculate_route_ors(api_key, start_location, end_location):
+def calculate_route_ors(api_key, start_location, end_location, preference, count_routes):
     # Инициализировать клиент OpenRouteService
     try:
         client = openrouteservice.Client(key=api_key)
@@ -61,37 +82,54 @@ def calculate_route_ors(api_key, start_location, end_location):
 
         if not start or not end:
             flash("Не найдено местоположений для начальной и конечной точек.", 'warning')
-            return None, None, None, None
+            return None, None, None
         # raise ValueError("Не найдено местоположений для начальной и конечной точек.")
 
         start_coords = (start.latitude, start.longitude)
         end_coords = (end.latitude, end.longitude)
 
     # Рассчитать маршрут
-        route = client.directions(
-            coordinates=[(start_coords[1], start_coords[0]), (end_coords[1], end_coords[0])],
-            profile='driving-car',
-            format='geojson'
-        )
+        if count_routes > 1:
+            route = client.directions(
+                coordinates=[(start_coords[1], start_coords[0]), (end_coords[1], end_coords[0])],
+                alternative_routes={
+                    "target_count": count_routes,  # Количество альтернативных маршрутов
+                    "weight_factor": 1.6  # Фактор, влияющий на различия между маршрутами
+                },
+                preference=preference,
+                profile='driving-car',
+                format='geojson'
+            )
+        else:
+            route = client.directions(
+                coordinates=[(start_coords[1], start_coords[0]), (end_coords[1], end_coords[0])],
+                preference=preference,
+                profile='driving-car',
+                format='geojson'
+            )
     except Exception as er:
         flash(f"{er}", 'warning')
-        return None, None, None, None
+        return None, None, None
 
-    route_coords = [(point[1], point[0]) for point in route['features'][0]['geometry']['coordinates']]
-    return start_coords, end_coords, route_coords, route
+    return start_coords, end_coords, route
 
 
 # Определить функцию для отображения маршрута на карте
-def display_route(route_coords):
-    return folium.PolyLine(route_coords, color="blue", weight=5, opacity=0.8)
+def display_route(route_coords, color, weight=5):
+    return folium.PolyLine(route_coords, color=color, weight=weight, opacity=0.8)
 
 
-def calculate_route(answer):
+def make_routes(answer):
     t0 = time.time()
+    preference = 'fastest'
+    for data in config.preferences:
+        if data['id'] == answer['select_preference']:
+            preference = data['value']
     answer['route'] = None
-    start_coords, end_coords, route_coords, route = \
-        calculate_route_ors(api_key, answer['start_point'], answer['end_point'])
+    start_coords, end_coords, route = \
+        calculate_route_ors(api_key, answer['start_point'], answer['end_point'], preference, answer['count_routes'])
     if start_coords:
+        answer['route'] = route
         answer['start_x'] = start_coords[0]
         answer['start_y'] = start_coords[1]
         answer['start_xy'] = '(' + str(start_coords[0]) + ' - ' + str(start_coords[1]) + ')'
@@ -99,12 +137,40 @@ def calculate_route(answer):
         answer['end_y'] = end_coords[1]
         answer['end_xy'] =  '(' + str(end_coords[0]) + ' - ' + str(end_coords[1]) + ')'
         answer['locations'] = []
-        locations = display_route(route_coords).locations
-        for point in locations:
-            answer['locations'].append(point)
+        for i in range(len(route['features'])):
+            route_coords = [(point[1], point[0]) for point in route['features'][i]['geometry']['coordinates']]
+            locations = []
+            weight = 5 if i == answer['select_route'] - 1 else 3
+            points = display_route(route_coords, colors[i], weight).locations
+            for point in points:
+                locations.append(point)
+            answer['locations'].append({"locations": locations, "color": colors[i]})   # добавить маршрут
         answer['route'] = route
-    answer['data'] = []
-    print('расчет маршрута', 'точек маршрута=', len(answer['locations']), 'время=', time.time() - t0)
+        answer['need_route'] = False
+        answer['first_calc'] = 20
+        answer['start_point_init'] = answer['start_point']
+        answer['end_point_init'] = answer['end_point']
+        answer['dt_start_init'] = answer['dt_start']
+        answer['count_routes_init'] = answer['count_routes']
+        answer['select_route_init'] = answer['select_route']
+        answer['select_preference_init'] = answer['select_preference']
+        points = ''
+        for location in answer['locations']:
+            points += str(len(location['locations'])) + ','
+        print('расчет маршрута', 'точек маршрута=', points, 'время=', time.time() - t0)
+
+
+def calculate_route(answer):
+    if answer['route']:
+        create_data(answer)  # создать таблицу data
+        load_weather(answer)  # загрузить погоду
+        load_accidents(answer)  # загрузить аварии
+        if len(answer['locations']) > 0:
+            dop_points(answer)  # дополнительные точки по погоде и дню недели
+            calc_weight(answer)  # рассчитать сумму весов и общий вес
+    answer['need_calc'] = False
+    # else:
+    #     answer['data'] = []
 
 
 def remember_point(answer, ind, txt):
@@ -175,7 +241,7 @@ def make_count_accident(answer):
     # Пометить точки маршрута, в которых произошли аварии
     answer['count_accidents'] = 0
     for unit in answer['data']:
-        if 'accident' in unit:
+        if 'is_accident' in unit and unit['is_accident']:
             answer['count_accidents'] += 1
 
 
@@ -189,6 +255,7 @@ def make_data_accident(answer, ans_big):
         data[key] = data[key] + unit[key] if key in data else unit[key]
 
     count = 0
+    answer['not_used'] = []
     if 'begin_day' in answer and answer['begin_day']:
         begin_day = datetime.datetime.fromtimestamp(answer['begin_day']).hour
         begin_night = datetime.datetime.fromtimestamp(answer['begin_night']).hour
@@ -226,10 +293,13 @@ def make_data_accident(answer, ans_big):
                     slave('day_night_weight')
                     slave('day_of_week_weight')
                     data['accident'] = unit
+                else:
+                    answer['not_used'].append(unit)
                 count += 1
     for data in answer['data']:
         if 'speed_limit_weight' in data:
             data['speed_limit_weight'] = round(data['speed_limit_weight'], 1)
+    answer['count_not_used'] = len(answer['not_used'])
     return count
 
 
@@ -337,12 +407,22 @@ def dop_points(answer):
 
 
 def analyses_request(answer, request):
+    if answer['select_preference'] != int(request.form.get('select_preference')):
+        answer['select_preference'] = int(request.form.get('select_preference'))
+        answer['need_route'] = True
+    if answer['count_routes'] != int(request.form.get('count_routes')):
+        answer['count_routes'] = int(request.form.get('count_routes'))
+        answer['need_route'] = True
+    if 'select_route' in request.form and answer['select_route'] != int(request.form.get('select_route')):
+        answer['select_route'] = int(request.form.get('select_route'))
+        answer['need_calc'] = True
+    answer['select_route'] = min(answer['select_route'], answer['count_routes'])
     if answer['with_accidents'] != ('with_accidents' in request.form):
-        answer['data'] = []
+        answer['need_route'] = True
     answer['with_accidents'] = 'with_accidents' in request.form
     if 'dt_start' in request.form:
         if answer['dt_start'] != request.form.get('dt_start'):
-            answer['data'] = []
+            answer['need_route'] = True
         answer['dt_start'] = request.form.get('dt_start')
     if 'accidents' in request.form:
         answer['switch'] = 'accidents'
@@ -352,14 +432,12 @@ def analyses_request(answer, request):
         answer['select_lang'] = request.form.get('select_lang')
     if answer['start_point'] != request.form.get('start_point'):
         answer['start_point'] = request.form.get('start_point')
-        answer['locations'] = []
-        answer['data'] = []
+        answer['need_route'] = True
     if answer['end_point'] != request.form.get('end_point'):
         answer['end_point'] = request.form.get('end_point')
-        answer['locations'] = []
-        answer['data'] = []
-    if 'calculate' in request.form and len(answer['locations']) == 0:
-        calculate_route(answer)
+        answer['need_route'] = True
+    if request.form.get('need_route') == '1':
+        answer['need_route'] = True
     if 'select_vid' in request.form:
         answer['select_type'] = request.form.get('select_vid')
     if answer['select_type'] == 'Table':
@@ -374,13 +452,15 @@ def create_data(answer):
     t0 = time.time()
     dt = time.mktime(time.strptime(answer['dt_start'], '%Y-%m-%dT%H:%M'))
     try:
-        steps = answer['route']['features'][0]['properties']['segments'][0]['steps'] if 'route' in answer else None
+        steps = answer['route']['features'][answer['select_route'] - 1]['properties']['segments'][0]['steps'] if 'route' in answer else None
     except:
         steps = None
-    for i, point in enumerate(answer['locations']):
-        if i == len(answer['locations']) - 1:
+
+    locations = answer['locations'][answer['select_route'] - 1]['locations']
+    for i, point in enumerate(locations):
+        if i == len(locations) - 1:
             break
-        s = geodesic(answer['locations'][i], answer['locations'][i + 1]).km  # расстояние отрезка
+        s = geodesic(locations[i], locations[i + 1]).km  # расстояние отрезка
         # определить среднюю скорость
         average_speed = 60
         if steps:
@@ -423,7 +503,6 @@ def load_accidents(answer):
         if is_ok:
             t0 = time.time()
             count = make_data_accident(answer, ans_big)
-            make_count_accident(answer)  # подсчитать количество аварий на маршруте
             print('make_data_accident', 'count=', count, 'время=', time.time() - t0)
         else:
             flash(ans_big, 'warning')
@@ -473,23 +552,23 @@ def prepare_form(user_id, request):
         return answer
     common.default_form(user_id, array_default, answer, 'road_')
     if request.method == 'POST':
+        common.choose_language(user_id, request)
         analyses_request(answer, request)
 
     answer['count_weather'] = 0  # кол-во запросов погоды
-    if len(answer['data']) == 0:
-        create_data(answer)  # создать таблицу data
-        load_weather(answer)  # загрузить погоду
-        load_accidents(answer)  # загрузить аварии
-    if len(answer['locations']) > 0:
-        dop_points(answer)  # дополнительные точки по погоде и дню недели
-        calc_weight(answer)  # рассчитать сумму весов и общий вес
+    if answer['need_route']:
+        make_routes(answer)  # прочитать маршруты с картой
+        calculate_route(answer)  # рассчитать выбранную альтернативу
+    if answer['need_calc']:
+        calculate_route(answer)  # рассчитать выбранную альтернативу
+        print('weathers', 'count=', len(answer['weathers']), 'запросов погоды=', answer['count_weather'])
 
     if answer['weight']:  # and answer['sec_route']:
         # answer['coefficient'] = int(answer['weight'] / (sec_route / 60) / 100)
         answer['coefficient'] = round(float(answer['weight']) / 60, 3)
         answer['empty_coefficient'] = max(0, answer['value_green'] + answer['value_yellow'] + answer['value_red'] -
                                       answer['coefficient'])
-        answer['weight'] = common.float1000(round(answer['weight'], 1))
+        answer['weight'] = common.float1000(round(float(answer['weight']), 1))
         if answer['coefficient'] <= answer['value_green']:
             answer['result_risk'] = 10
         elif answer['coefficient'] <= answer['value_yellow'] + answer['value_yellow']:
@@ -503,6 +582,26 @@ def prepare_form(user_id, request):
         make_chart(answer)
     if answer['select_type'] == 'Chart weight':
         make_chart(answer, 'weight')
+    txt = language.get_lang(user_id, 'road', language.road)
+    answer['preferences'] = config.preferences.copy()
+    for data in answer['preferences']:
+        data['name'] = txt[data['id']]
+    answer['select_route_color'] = 'light' + colors[answer['select_route'] - 1]
+    if answer['select_route'] == 2:
+        answer['select_route_color'] = colors[answer['select_route'] - 1]
+    make_count_accident(answer)  # подсчитать количество аварий на маршруте
+    if answer['dist']:
+        if float(answer['dist']) <= 15:
+            answer['zoom'] = 13
+        elif float(answer['dist']) <= 30:
+            answer['zoom'] = 12
+        elif float(answer['dist']) <= 50:
+            answer['zoom'] = 11
+        elif float(answer['dist']) <= 75:
+            answer['zoom'] = 10
+        elif float(answer['dist']) <= 155:
+            answer['zoom'] =9
+        else:
+            answer['zoom'] = 8
     common.save_form(user_id, array_default, answer, 'road_')
-    print('weathers', 'count=', len(answer['weathers']), 'запросов погоды=', answer['count_weather'])
     return answer

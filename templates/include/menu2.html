@@ -2,29 +2,10 @@
     <div class="dws_menu">
     <nav class="dws-menu">
         <ul>
-            <li><a href="{{url_for('road', user_id=upr['user_id'])}}">Route</a></li>
+            <li><a href="{{url_for('road', user_id=upr['user_id'])}}">{{menu_txt[1]}}</a></li>
             <li><a href="{{url_for('login')}}">Login</a></li>
-            <li>
-                <a href="#">Language</a>
-                <ul>
-                    {% for lang in upr['languages'] %}
-                        <li>
-                            <a href="{{url_for('choose_language', user_id=upr['user_id'], lang=lang['key'])}}">
-                                {% if lang['key'] == upr['select_language'] %}
-                                    <b> {{lang['name']}}</b>
-                                {% else %}
-                                    {{lang['name']}}
-                                {% endif %}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
         </ul>
     </nav>
-    </div>
-    <div id="select_language">
-         <span style="background: {{colors['background']}}; color: {{colors['black']}}">{{upr['select_language']}}</span>
     </div>
 </header>
 <link rel="stylesheet" type="text/css" href="/static/css/menu2.css">

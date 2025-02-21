@@ -10,4 +10,9 @@ languages = [
     {"key": "es", "name": "ES - Spanish"},
     {"key": "zh-CN", "name": "zh-CN - Chinese (simplified)"},
 ]
+preferences = [
+    {"id": 17, "name": '', "value": 'fastest'},
+    {"id": 18, "name": '', "value": 'shortest'},
+    {"id": 19, "name": '', "value": 'recommended'},
+]
 

@@ -56,10 +56,10 @@
 </head>
 <body style="background: {{colors['background']}}; color: {{colors['black']}};">
 <form method="post" name="{{own}}">
+      {% include "include/select_language.html" %}
       <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
       <basefont size="6">
       <div class="menu">
-          <input type="hidden" name="user_id" value="{{upr['user_id']}}">
           {% include "include/menu2.html" %}
       </div> <!-- menu -->
       <div class="container-flash">
@@ -73,12 +73,19 @@
       </div> <!-- container-flash -->
       <div class="points">
         <p>
-            <button type="submit" name="calculate" class="simple-button"
+            <input type="hidden" id="need_route" name="need_route" value="{{par['need_route']}}">
+            <button type="submit" name="calculate" class="simple-button" id="button_need_route"
                     style="background: {{colors['lightgray']}}; color: {{colors['red']}}"
-                    title="Calculate route">
+                    title="Calculate route (was changes)">
                 {{txt[2]}}
             </button>
-            <select name="select_vid" id="select_vid" style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+            <button type="submit" name="need_route" class="simple-text" id="button_not_need_route"
+                    style="background: {{colors['background']}}; color: {{colors['red']}}"
+                    title="Calculate route again">
+                <u>{{txt[par['first_calc']]}}</u>
+            </button>
+            <select name="select_vid" id="select_vid" title="{{txt[21]}}"
+                    style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
                 {% for type in par['types'] %}
                     {% if type == par['select_type'] %}
                         <option value="{{type}}" selected>{{type}}</option>
@@ -89,15 +96,19 @@
             </select>
 
             <span style="colors: {{colors['blue']}}">{{txt[0]}}:</span>
-            <input name="start_point" class="search" type="search"
+            <input id="start_point_init" value="{{par['start_point_init']}}" hidden>
+            <input name="start_point" class="search" type="search" id="start_point" title="{{txt[22]}}"
                    style="background: {{colors['background']}}; color: {{colors['black']}}" value="{{par['start_point']}}"
                    placeholder="Input start point">
             <span style="colors: {{colors['blue']}}">{{txt[1]}}:</span>
-            <input name="end_point" class="search" type="search"
+            <input id="end_point_init" value="{{par['end_point_init']}}" hidden>
+            <input name="end_point" class="search" type="search" id="end_point"  title="{{txt[23]}}"
                    style="background: {{colors['background']}}; color: {{colors['black']}}" value="{{par['end_point']}}"
                    placeholder="Input end point">
             <span style="color: {{colors['blue']}};">{{txt[3]}}:</span>
-            <input type="datetime-local" name="dt_start" value="{{par['dt_start']}}" required
+            <input type="datetime-local" id="dt_start_init" value="{{par['dt_start_init']}}" hidden>
+            <input type="datetime-local" name="dt_start" value="{{par['dt_start']}}" required id="dt_start"
+                   title="{{txt[24]}}"
                    style="background: {{colors['background']}}; color: {{colors['black']}};">
             {% if par['with_accidents'] %}
                 <input type="checkbox" class="checkbox" name="with_accidents" checked>{{txt[14]}}
@@ -105,6 +116,34 @@
                 <input type="checkbox" class="checkbox" name="with_accidents">{{txt[14]}}
             {% endif %}
         </p>
+          <p>
+              {{txt[25]}}:
+                <input value="{{par['select_preference_init']}}" id="select_preference_init" hidden>
+                <select name="select_preference" id="select_preference" title="{{txt[26]}}"
+                        style="background: {{colors['background']}}; color: {{colors['color_combobox']}};">
+                    {% for data in par['preferences'] %}
+                        {% if data['id'] == par['select_preference'] %}
+                            <option value="{{data['id']}}" selected>{{data['name']}}</option>
+                        {% else %}
+                            <option value="{{data['id']}}">{{data['name']}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+              {{txt[27]}} =
+              <input type="number" value="{{par['count_routes_init']}}" id="count_routes_init" hidden>
+              <input type="number" max="3" min="1" name="count_routes" value="{{par['count_routes']}}"
+                     id="count_routes" title="{{txt[28]}}"
+                     style="background: {{colors['background']}}; color: {{colors['black']}};">
+
+              <input type="number" value="{{par['select_route_init']}}" hidden id="select_route_init">
+              <label class="select_route" style="color: {{par['select_route_color']}};">
+                  {{txt[29]}}=
+              </label>
+                 <input type="number" max="{{par['count_routes']}}" min="1" name="select_route" id="select_route"
+                        value="{{par['select_route']}}" class="select_route_value"
+                        title="{{txt[30]}}"
+                        style="background: {{colors['background']}}; color: {{par['select_route_color']}};">
+          </p>
         <p>
             {% if par['dist'] %}
                 <span style="color: {{colors['blue']}}"> {{txt[4]}}=</span> {{par['dist']}}
@@ -116,7 +155,8 @@
                 <span style="color: {{colors['blue']}}">{{txt[6]}}=</span>{{par['weight']}}
             {% endif %}
             {% if par['coefficient'] %}
-            <span style="color: {{colors['blue']}}">&nbsp&nbsp&nbsp&nbsp{{txt[9]}}=</span><span style="color: {{colors['red']}}; font-size: 18px;">{{par['coefficient']}}</span>
+            <span style="color: {{colors['blue']}}">&nbsp&nbsp&nbsp&nbsp{{txt[9]}}=</span>
+            <span style="color: {{colors['red']}}; font-size: 18px;">{{par['coefficient']}}</span>
             {% endif %}
             {% if par['max_weight'] %}
                 <span style="color: {{colors['blue']}}">&nbsp&nbsp&nbsp&nbsp(max=</span>{{par['max_weight']}}
@@ -258,6 +298,85 @@
                                     </td>
                                 </tr>
                             {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> <!-- data -->
+     {% elif par['select_type'] == 'Accident not used' %}
+                {% if par['count_not_used'] %}
+                    <div align="center" style="color: {{colors['red']}}; background: {{colors['background']}}">
+                        {{txt[16]}} = {{par['count_not_used']}}
+                    </div>
+                {% endif %}
+            <div class="data">
+                <table id="newsTable" class="table table-sm">
+                    <thead  align="center" style="background: {{colors['lightgray']}}; color: {{colors['black']}};">
+                        <tr>
+                            <th id="th_district" scope="col" title="Region name">district</th>
+                            <th id="th_district_weight" scope="col" title="district weight">district weight</th>
+                            <th id="th_speed_limit" scope="col" title="Speed limit">speed limit</th>
+                            <th id="th_speed_limit_weight" scope="col" title="speed limit weight">speed weight</th>
+    <!--                        <th id="th_road_type_weight" scope="col" title="road_type_weight">road type weight</th>-->
+                            <th id="th_weather_condition" scope="col" title="weather condition">weather</th>
+                            <th id="th_weather_condition_weight" scope="col" title="weather condition weight">weather weight</th>
+                            <th id="th_road_condition" scope="col" title="road_condition">road condition</th>
+                            <th id="th_road_condition_weight" scope="col" title="road condition">road weight</th>
+                            <th id="th_day_night" scope="col" title="day_night">day night</th>
+                            <th id="th_day_night_weight" scope="col" title="day nightweight">day night weight</th>
+                            <th id="th_lighting_weight" scope="col" title="lighting_weight">lighting weight</th>
+                            <th id="th_day_of_week" scope="col" title="day_of_week">day of week</th>
+                            <th id="th_day_of_week_weight" scope="col" title="day_of_week_weight">day of week weight</th>
+                            <th id="th_x" scope="col" title="Latitude">y</th>
+                            <th id="th_y" scope="col" title="Longitude">x</th>
+                            <th id="th_severity" scope="col" title="severity">S</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                    </tfoot>
+                    <tbody>
+                        {% for data in par['not_used'] %}
+                            <tr style="color: {{colors['black']}};">
+                                <td>{{data['district_name_eng']}}</td>
+                                <td><div align="right">{{data['district_weight']}}</div></td>
+                                <td>
+                                    {% if data['speed_limit'] %}
+                                        {{data['speed_limit']}}
+                                    {% endif %}
+                                </td>
+                                <td>{{data['speed_limit_weight']}}</td>
+                                <td>
+                                    {% if data['weather_condition'] %}
+                                        {{data['weather_condition']}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if data['weather_condition_weight'] %}
+                                        <div align="right">{{data['weather_condition_weight']}}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if data['road_condition'] %}
+                                        {{data['road_condition']}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if data['road_condition_weight'] %}
+                                        <div align="right">{{data['road_condition_weight']}}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{data['day_night']}}</td>
+                                <td><div align="right">{{data['day_night_weight']}}</div></td>
+                                <td>{{data['lighting_weight']}}</td>
+                                <td>{{data['day_of_week_name']}}</td>
+                                <td><div align="right">{{data['day_of_week_weight']}}</div></td>
+                                <td><div align="right">{{data['longitude_str']}}</div></td>
+                                <td><div align="right">{{data['latitude_str']}}</div></td>
+                                <td>
+                                    {% if data['severity'] %}
+                                        <div align="right">{{data['severity']}}</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -447,7 +566,7 @@
                 {% endif %}
                 crs: L.CRS.EPSG3857,
                 ...{
-                      "zoom": 9,
+                      "zoom": {{par['zoom']}},
                       "zoomControl": true,
                       "preferCanvas": false,
                     }
@@ -468,6 +587,8 @@
             }
         );
         tile_layer_cae6cde8fbfcd30c800e14e41ae66e07.addTo(map_f4ea2d590327241e553f226e8564c166);
+
+        <!-- добавить на карту начальную точку -->
         var marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666 = L.marker(
                 {% if par['start_x'] %}
                     [{{par['start_x']}}, {{par['start_y']}}],
@@ -476,6 +597,7 @@
                 {% endif %}
         ).addTo(map_f4ea2d590327241e553f226e8564c166);
 
+        <!-- иконка начальной точки -->
         var icon_84b8e3f1ca8851251ae5743c020b4785 = L.AwesomeMarkers.icon(
             {
                 "markerColor": "green",
@@ -486,12 +608,14 @@
             }
         );
         marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.setIcon(icon_84b8e3f1ca8851251ae5743c020b4785);
+        <!-- tooltip начальной точки -->
         marker_3d8e5a1c6fa863b6ff1c72a1c0c2d666.bindTooltip(
             `<div> {{par['start_point']}} {{par['start_xy']}} </div>`,
             { "sticky": true, }
         );
 
     <!-- добавить на карту точки аварий -->
+        <!-- иконка аварий -->
         var icon_accident = L.AwesomeMarkers.icon(
             {
                 "markerColor": "blue",
@@ -499,6 +623,7 @@
                 "extraClasses": "fa-class",
             }
         );
+        <!-- иконка крупных аварий -->
         var icon_big_accident = L.AwesomeMarkers.icon(
             {
                 "markerColor": "yellow",
@@ -525,6 +650,7 @@
             {% endif %}
         {% endfor %}
 
+        <!-- добавить на карту конечную точку -->
         var marker_d547c9fda8e0eadf27523382b3fba29e = L.marker(
                 {% if par['end_x'] %}
                     [{{par['end_x']}}, {{par['end_y']}}],
@@ -544,30 +670,99 @@
             }
         );
         marker_d547c9fda8e0eadf27523382b3fba29e.setIcon(icon_5ceb0f7235a77422e8861bc11480230c);
+        <!-- tooltip конечной точки -->
         marker_d547c9fda8e0eadf27523382b3fba29e.bindTooltip(
             `<div> {{par['end_point']}} {{par['end_xy']}} </div>`,
             { "sticky": true, }
         );
-        var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
-            {{par['locations']}},
-            {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue",
-            "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
-            "smoothFactor": 1.0, "stroke": true, "weight": 5}
-        ).addTo(map_f4ea2d590327241e553f226e8564c166);
+
+        <!-- добавить на карту линии маршрута -->
+        {% for data in par['locations'] %}
+            var poly_line_e8b1b906de671f211ee84b282ba5bd9d = L.polyline(
+                    {{data['locations']}},
+                    {"bubblingMouseEvents": true, "color": "{{data['color']}}", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "{{data['color']}}",
+                    "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8,
+                    "smoothFactor": 1.0, "stroke": true, "weight": 5}
+            ).addTo(map_f4ea2d590327241e553f226e8564c166);
+        {% endfor %}
+        $('body').show();
     </script>
 {% endif %}
 
 <script>
+    var need_route = document.querySelector('#need_route');
+    var button_need_route = document.querySelector('#button_need_route');
+    var button_not_need_route = document.querySelector('#button_not_need_route');
+    var start_point = document.querySelector('#start_point');
+    var start_point_init = document.querySelector('#start_point_init');
+    var end_point = document.querySelector('#end_point');
+    var end_point_init = document.querySelector('#end_point_init');
+    var dt_start = document.querySelector('#dt_start');
+    var dt_start_init = document.querySelector('#dt_start_init');
+    var count_routes = document.querySelector('#count_routes');
+    var count_routes_init = document.querySelector('#count_routes_init');
+    var class_select_route = document.querySelector('.select_route');
+    var class_select_route_value = document.querySelector('.select_route_value');
+    var select_preference = document.querySelector('#select_preference');
+    var select_preference_init = document.querySelector('#select_preference_init');
+
+    var select_route = document.querySelector('#select_route');
+    var select_route_init = document.querySelector('#select_route_init');
+
     {% if par['select_type'] == 'Table' %}
         const scroller = document.querySelector('.data');
         const scroll = document.querySelector("#scroll");
      {% endif %}
     $(function() {
         $(document).ready(function () {
-            $('select').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#select_vid').on('change', function() { document.forms['{{own}}'].submit(); });
             $('.checkbox').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#select_language').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#start_point').on('input', function() { calc_change(); });
+            $('#end_point').on('input', function() { calc_change(); });
+            $('#dt_start').on('input', function() { calc_change(); });
+            $('#select_route').on('input', function() { document.forms['{{own}}'].submit();});
+            $('#count_routes').on('input', function() { calc_change(); });
+            $('#select_preference').on('input', function() { calc_change(); });
+
+            $('#button_need_route').on('click', function() {
+                need_route.value = '1';
+                document.forms['{{own}}'].submit(); });
+            $('#button_not_need_route').on('click', function() {
+                need_route.value = '1';
+                document.forms['{{own}}'].submit(); });
+
+            function calc_change() {
+                var count = 0;
+                if (start_point && start_point_init && start_point.value.trim() !== '' &&
+                    start_point.value.trim() !== start_point_init.value.trim()) { count += 1; }
+                if (end_point && end_point_init && end_point.value.trim() !== '' &&
+                    end_point.value.trim() !== end_point_init.value.trim()) { count += 1; }
+                if (dt_start && dt_start_init && dt_start.value.trim() !== '' &&
+                    dt_start.value.trim() !== dt_start_init.value.trim()) { count += 1; }
+                if (select_route && select_route_init && select_route.value.trim() !== '' &&
+                    select_route.value.trim() !== select_route_init.value.trim()) { count += 1; }
+                if (count_routes && count_routes_init && count_routes.value.trim() !== '' &&
+                    count_routes.value.trim() !== count_routes_init.value.trim()) { count += 1; }
+                if (select_preference && select_preference_init &&
+                    select_preference.value.trim() !== select_preference_init.value.trim()) { count += 1; }
+                if (count_routes.value == '1')
+                    {
+                        class_select_route.style.visibility = 'hidden';
+                        class_select_route_value.style.visibility = 'hidden';
+                    } else
+                    {
+                        class_select_route.style.visibility = 'visible';
+                        class_select_route_value.style.visibility = 'visible';
+                    };
+                if (count > 0)
+                    { button_need_route.style.visibility = 'visible'; button_not_need_route.style.visibility = 'hidden'; }
+                else
+                    { button_need_route.style.visibility = 'hidden'; button_not_need_route.style.visibility = 'visible'; };
+            };
 
         $(function () {
+            calc_change();
             $('body').show();
             {% if par['select_type'] == 'Table' %}
                     scroller.scrollTop=scroll.value;
@@ -582,4 +777,14 @@
     {% endif %}
 });
 </script>
+
+<script>
+   document.querySelector('form').addEventListener('keypress', function(event) {
+if (event.key === 'Enter' && event.target.type !== 'textarea')     {
+       // Стоп, отправка прерывается!
+       event.preventDefault();
+     }
+   });
+</script>
+
 </html>

@@ -1,8 +1,15 @@
-from common import get
-from deep_translator import GoogleTranslator
 import time
 import json
 import os
+
+from deep_translator import GoogleTranslator
+
+from common import get
+
+menu = [
+    {"0": "Возможные языки интерфейса"},
+    {"1": "Маршрут"},
+]
 
 road = [
     {"0": "Начальная точка"},
@@ -21,6 +28,21 @@ road = [
     {"13": "Прогноз на поездку"},
     {"14": "С учетом аварий"},
     {"15": "Распределение коэффициентов по маршруту"},
+    {"16": "Не использованные аварии"},
+    {"17": "Самый быстрый"},
+    {"18": "Самый короткий"},
+    {"19": "Рекомендованный"},
+    {"20": "Рассчитать повторно"},
+    {"21": "Указание вида расчетной информации"},
+    {"22": "Задание начальной точки маршрута"},
+    {"23": "Задание конечной точки маршрута"},
+    {"24": "Задание время начала движения по маршруту"},
+    {"25": "Предпочтение"},
+    {"26": "Выбор количественного предпочтения для маршрута"},
+    {"27": "Количество альтернатив"},
+    {"28": "Задание количества альтернативных маршрутов (1-3)"},
+    {"29": "Расчет по альтернативе"},
+    {"30": "Указание номера маршрута для которого будет расчет информации"},
 ]
 
 lang = dict()
@@ -28,7 +50,7 @@ lang_busy = False
 
 
 def get_lang(user_id, form, array_text):
-    to_lang = get(user_id, 'select_language')
+    to_lang = get(user_id, 'upr')['select_language']
     return get_value_language(form, array_text, to_lang)
 
 
@@ -39,6 +61,22 @@ def get_value_language(key, array_text, to_lang):
     if key not in lang[to_lang]:
         lang[to_lang][key] = translate_array(array_text, to_lang)
         save_lang()
+    else:
+        l = len(lang[to_lang][key])
+        n = len(array_text)
+        tolang = 'iw' if to_lang == 'he' else to_lang
+        if l < n:
+            while l < n:
+                txt = array_text[l][str(l)]
+                if to_lang != 'ru':
+                    try:
+                        txt = GoogleTranslator(target=tolang).translate(array_text[l][str(l)])
+                    except Exception as er:
+                        txt = array_text[l][str(l)]
+                        print(f"{er}")
+                lang[to_lang][key].append(txt)
+                l += 1
+            save_lang()
     return lang[to_lang][key]
 
 
@@ -49,7 +87,15 @@ def translate_array(array, to_lang):
             to_lang = 'iw'
         for unit in array:
             for key in unit.keys():
-                result.append(GoogleTranslator(target=to_lang).translate(unit[key]))
+                if to_lang == 'ru':
+                    result.append(unit[key])
+                else:
+                    try:
+                        txt = GoogleTranslator(target=to_lang).translate(unit[key])
+                        result.append(txt)
+                    except Exception as er:
+                        print(f"{er}")
+                        return []
         return result
     except Exception as er:
         print(f"{er}")

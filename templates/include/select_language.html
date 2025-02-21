@@ -1,0 +1,18 @@
+<div id="user_name">
+  <!-- <span style="background: {{colors['background']}}; color: {{colors['black']}}">{{upr['user_name']}} -->
+  {% if languages %}
+    <select class="combo" name="select_language" id="select_language"
+            title="{{menu_txt[0]}}"
+            style="background: {{colors['background']}}; color: {{colors['yellow']}}"
+            onchange="choose_language()">
+        {% for lang in languages %}
+            {% if lang['key'] == upr['select_language'] %}
+                <option value="{{lang['key']}}" selected>{{lang['key']}}</option>
+            {% else %}
+                <option value="{{lang['key']}}">{{lang['key']}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+  {% endif %}
+  </span>
+</div>

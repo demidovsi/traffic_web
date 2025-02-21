@@ -32,16 +32,6 @@ def login():
         return redirect(st_redirect)
 
 
-@app.route('/choose_language/<user_id>/<lang>/', methods=('GET', 'POST'))
-def choose_language(user_id, lang):
-    users_session.users.load()
-    add(user_id, 'select_language', lang)
-    upr = get(user_id, 'upr')
-    upr['select_language'] = lang
-    users_session.users.save()
-    return redirect('/road/{user_id}/'.format(user_id=user_id))
-
-
 @app.route('/road/<user_id>/', methods=('GET', 'POST'))
 def road(user_id):
     par = c_road.prepare_form(user_id, request)
@@ -50,8 +40,10 @@ def road(user_id):
         return redirect(par['redirect'])
     return render_template(
         'route_map.html', colors=get(user_id, 'upr')['colors'], upr=get(user_id, 'upr'), par=par,
-        own='road', txt=language.get_lang(user_id, 'road', language.road),
-        lang=get(user_id, 'select_language'))
+        own='road',
+        txt=language.get_lang(user_id, 'road', language.road),
+        menu_txt=language.get_lang(user_id, 'menu', language.menu),
+        lang=get(user_id, 'select_language'), languages=config.languages)
 
 
 common.current_path = os.path.abspath(os.curdir)
