@@ -1,15 +1,18 @@
 import time
-import common
 import datetime
+
 from flask import flash
 import openrouteservice
 import folium
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+
+import common
 import big_query
 import config
 import meteo
 import language
+import postgresql
 
 types = [
     'Table', 'Riskmeter', 'Chart coeff', 'Chart weight', 'Accident not used'
@@ -164,7 +167,8 @@ def calculate_route(answer):
     if answer['route']:
         create_data(answer)  # создать таблицу data
         load_weather(answer)  # загрузить погоду
-        load_accidents(answer)  # загрузить аварии
+        # load_accidents(answer)  # загрузить аварии
+        load_accidents_postgresql(answer)  # загрузить аварии
         if len(answer['locations']) > 0:
             dop_points(answer)  # дополнительные точки по погоде и дню недели
             calc_weight(answer)  # рассчитать сумму весов и общий вес
@@ -506,6 +510,30 @@ def load_accidents(answer):
             print('make_data_accident', 'count=', count, 'время=', time.time() - t0)
         else:
             flash(ans_big, 'warning')
+
+
+def load_accidents_postgresql(answer):
+    answer['count_accidents'] = 0
+    if not answer['with_accidents']:
+        return
+    values = ''
+    for data in answer['data']:
+        x = data['x']
+        y = data['y']
+        values = values + ' or\n' if values else values
+        values += " longitude_str='{x}' and latitude_str='{y}'".format(x=x, y=y)
+    if values:
+        query = ('select * from {schema}.accident_analysis where {values} order by year_accident;').format(
+            schema=config.schema, values=values)
+        t0 = time.time()
+        is_ok, ans = postgresql.execute_script(query)
+        if is_ok:
+            print('чтение из postgresql', 'получено строк=', len(ans), 'время=', time.time() - t0)
+            t0 = time.time()
+            count = make_data_accident(answer, ans)
+            print('make_data_accident', 'count=', count, 'время=', time.time() - t0)
+        else:
+            flash(ans, 'warning')
 
 
 def make_chart(answer, key='coeff'):
