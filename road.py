@@ -229,8 +229,9 @@ def get_weather(answer, ind):
     unit = get_point(answer, ind)
     if unit is None:
         txt = meteo.get_forecast(answer['data'][ind]['x'], answer['data'][ind]['y'])
-        answer['count_weather'] += 1
-        unit = remember_point(answer, ind, txt)
+        if txt:
+            answer['count_weather'] += 1
+            unit = remember_point(answer, ind, txt)
     answer['begin_day'] = unit['begin_day']
     answer['begin_night'] = unit['begin_night']
     answer['data'][ind]['weather_condition'] = None
@@ -252,6 +253,7 @@ def make_count_accident(answer):
 def load_weather(answer):
     for i in range(len(answer['data'])):
         get_weather(answer, i)
+    print('weathers', 'count=', len(answer['weathers']), 'запросов погоды=', answer['count_weather'])
 
 
 def make_data_accident(answer, ans_big):
@@ -589,7 +591,6 @@ def prepare_form(user_id, request):
         calculate_route(answer)  # рассчитать выбранную альтернативу
     if answer['need_calc']:
         calculate_route(answer)  # рассчитать выбранную альтернативу
-        print('weathers', 'count=', len(answer['weathers']), 'запросов погоды=', answer['count_weather'])
 
     if answer['weight']:  # and answer['sec_route']:
         # answer['coefficient'] = int(answer['weight'] / (sec_route / 60) / 100)

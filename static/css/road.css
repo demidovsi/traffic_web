@@ -119,3 +119,7 @@ th, td {
 select {border: none;}
 
 #th_district {width: 150px;}
+
+.blinking-button {
+            animation: blink 1s infinite;
+        }

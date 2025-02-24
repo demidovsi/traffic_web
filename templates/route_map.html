@@ -15,7 +15,34 @@
     
     <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
     <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
-<!--{% if lang == 'iw' %}-->
+    <style>
+        @keyframes blink {
+            0% { opacity: 1; }
+            10% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .blinking-button {
+            animation: blink 1s infinite;
+        }
+    </style>
+    <style>
+        .loading-icon {
+            display: none;
+            position: fixed;
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #000;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!--{% if lang == 'iw' %}-->
 <!--    <style>-->
 <!--        body {-->
 <!--            direction: rtl;-->
@@ -57,7 +84,8 @@
 <body style="background: {{colors['background']}}; color: {{colors['black']}};">
 <form method="post" name="{{own}}">
       {% include "include/select_language.html" %}
-      <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
+    <div id="loadingIcon" class="loading-icon"><img src="/static/waiting.png" width="128" height="128"></div>
+    <input type="hidden" id="scroll" name="scroll" value="{{par['scroll']}}">
       <basefont size="6">
       <div class="menu">
           {% include "include/menu2.html" %}
@@ -74,12 +102,12 @@
       <div class="points">
         <p>
             <input type="hidden" id="need_route" name="need_route" value="{{par['need_route']}}">
-            <button type="submit" name="calculate" class="simple-button" id="button_need_route"
+            <button name="calculate" class="blinking-button" id="button_need_route"
                     style="background: {{colors['lightgray']}}; color: {{colors['red']}}"
                     title="Calculate route (was changes)">
                 {{txt[2]}}
             </button>
-            <button type="submit" name="need_route" class="simple-text" id="button_not_need_route"
+            <button name="need_route" class="simple-text" id="button_not_need_route"
                     style="background: {{colors['background']}}; color: {{colors['red']}}"
                     title="Calculate route again">
                 <u>{{txt[par['first_calc']]}}</u>
@@ -705,6 +733,7 @@
     var class_select_route_value = document.querySelector('.select_route_value');
     var select_preference = document.querySelector('#select_preference');
     var select_preference_init = document.querySelector('#select_preference_init');
+    const loadingIcon = document.getElementById('loadingIcon');
 
     var select_route = document.querySelector('#select_route');
     var select_route_init = document.querySelector('#select_route_init');
@@ -726,11 +755,23 @@
             $('#select_preference').on('input', function() { calc_change(); });
 
             $('#button_need_route').on('click', function() {
+                button_need_route.style.visibility = 'hidden';
+                button_need_route.classList.remove('blinking-button');
                 need_route.value = '1';
-                document.forms['{{own}}'].submit(); });
+                loadingIcon.style.display = 'block';
+                document.body.style.backgroundColor = '#DCDCDC';
+                document.body.style.color = 'black';
+                document.forms['{{own}}'].submit();
+                });
+
             $('#button_not_need_route').on('click', function() {
+                button_not_need_route.style.visibility = 'hidden';
                 need_route.value = '1';
-                document.forms['{{own}}'].submit(); });
+                loadingIcon.style.display = 'block';
+                document.body.style.backgroundColor = '#DCDCDC';
+                document.body.style.color = 'black';
+                document.forms['{{own}}'].submit();
+                });
 
             function calc_change() {
                 var count = 0;
