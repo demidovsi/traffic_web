@@ -132,5 +132,9 @@ header{
     border: none;
 }
 
-#select_language {
+#select_theme {
+    position: absolute;
+    top: 10px;
+    right: 80px;
+    border: none;
 }

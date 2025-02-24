@@ -27,7 +27,8 @@
     "en": {
         "menu": [
             "Possible interface languages",
-            "Route"
+            "Route",
+            "The color scheme of the application"
         ],
         "road": [
             "Starting point",
@@ -141,7 +142,8 @@
     "ru": {
         "menu": [
             "Возможные языки интерфейса",
-            "Маршрут"
+            "Маршрут",
+            "Цветовая схема приложения"
         ],
         "road": [
             "Начальная точка",

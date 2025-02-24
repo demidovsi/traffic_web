@@ -1,10 +1,8 @@
 <div id="user_name">
-  <!-- <span style="background: {{colors['background']}}; color: {{colors['black']}}">{{upr['user_name']}} -->
   {% if languages %}
     <select class="combo" name="select_language" id="select_language"
             title="{{menu_txt[0]}}"
-            style="background: {{colors['background']}}; color: {{colors['yellow']}}"
-            onchange="choose_language()">
+            style="background: {{colors['background']}}; color: {{colors['yellow']}}">
         {% for lang in languages %}
             {% if lang['key'] == upr['select_language'] %}
                 <option value="{{lang['key']}}" selected>{{lang['key']}}</option>
@@ -14,5 +12,18 @@
         {% endfor %}
     </select>
   {% endif %}
-  </span>
+    <select class="combo" name="select_theme" id="select_theme"
+            title="{{menu_txt[2]}}"
+            style="background: {{colors['background']}}; color: {{colors['blue']}}">
+        {% if upr['select_theme'] == 'black' %}
+            <option value="black" selected>black</option>
+        {% else %}
+            <option value="black">black</option>
+        {% endif %}
+        {% if upr['select_theme'] == 'white' %}
+            <option value="white" selected>white</option>
+        {% else %}
+            <option value="white">white</option>
+        {% endif %}
+    </select>
 </div>

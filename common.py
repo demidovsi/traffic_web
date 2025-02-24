@@ -1,11 +1,11 @@
-import json
-
-import users_session
 from flask import session
 import datetime
 import time
-import config
 import base64
+
+import config
+import colors
+import users_session
 
 app_lang = 'ru'
 current_path = ''
@@ -314,4 +314,10 @@ def choose_language(user_id, request):
     if 'select_language' in request.form:
         upr = get(user_id, 'upr')
         upr['select_language'] = request.form.get('select_language')
+        add(user_id, 'upr', upr)
+    if 'select_theme' in request.form:
+        add(user_id, 'theme', request.form.get('select_theme'))
+        upr = get(user_id, 'upr')
+        upr['select_theme'] = request.form.get('select_theme')
+        upr['colors'] = colors.colors[get(user_id, 'theme')]
         add(user_id, 'upr', upr)
