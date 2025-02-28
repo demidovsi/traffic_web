@@ -744,10 +744,10 @@
      {% endif %}
     $(function() {
         $(document).ready(function () {
-            $('#select_vid').on('change', function() { document.forms['{{own}}'].submit(); });
-            $('.checkbox').on('change', function() { document.forms['{{own}}'].submit(); });
-            $('#select_language').on('change', function() { document.forms['{{own}}'].submit(); });
-            $('#select_theme').on('change', function() { document.forms['{{own}}'].submit(); });
+            $('#select_vid').on('change', function() { loadingIcon.style.display = 'block'; document.forms['{{own}}'].submit(); });
+            $('.checkbox').on('change', function() { loadingIcon.style.display = 'block'; document.forms['{{own}}'].submit(); });
+            $('#select_language').on('change', function() {  loadingIcon.style.display = 'block'; document.forms['{{own}}'].submit(); });
+            $('#select_theme').on('change', function() { loadingIcon.style.display = 'block'; document.forms['{{own}}'].submit(); });
             $('#start_point').on('input', function() { calc_change(); });
             $('#end_point').on('input', function() { calc_change(); });
             $('#dt_start').on('input', function() { calc_change(); });
