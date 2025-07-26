@@ -7,7 +7,7 @@ import common
 from common import get, add
 import login as c_login
 import road as c_road
-import big_query
+# import big_query
 import language
 import json
 
@@ -59,5 +59,5 @@ users_session.users = users_session.Session()
 if __name__ == '__main__':
     if os.path.exists('static/session.json'):
         os.remove('static/session.json')
-    big_query.init_work()
+    # big_query.init_work()
     app.run(port=config.OWN_PORT, host=config.OWN_HOST)

@@ -3,3 +3,4 @@ venv_win
 .idea
 __pycache__
 static/session.json
+traffic_web

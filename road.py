@@ -8,7 +8,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 import common
-import big_query
+# import big_query
 import config
 import meteo
 import language
@@ -489,29 +489,29 @@ def create_data(answer):
     print('изготовление таблицы data', 'время=', time.time() - t0)
 
 
-def load_accidents(answer):
-    answer['count_accidents'] = 0
-    if not answer['with_accidents']:
-        return
-    query = ''
-    for data in answer['data']:
-        x = data['x']
-        y = data['y']
-        query = query + ',\n' if query else query
-        query += "('{x}', '{y}')".format(x=x, y=y)
-    if query:
-        query = ('select * from {schema}.traffic.accident_analysis where '
-                 '(longitude_str, latitude_str) IN UNNEST([{query}]) order by year_accident;').format(
-            schema=big_query.catalog, query=query)
-        t0 = time.time()
-        is_ok, ans_big = big_query.execute_script(query)
-        print('чтение из big-query', 'получено строк=', len(ans_big), 'время=', time.time() - t0)
-        if is_ok:
-            t0 = time.time()
-            count = make_data_accident(answer, ans_big)
-            print('make_data_accident', 'count=', count, 'время=', time.time() - t0)
-        else:
-            flash(ans_big, 'warning')
+# def load_accidents(answer):
+#     answer['count_accidents'] = 0
+#     if not answer['with_accidents']:
+#         return
+#     query = ''
+#     for data in answer['data']:
+#         x = data['x']
+#         y = data['y']
+#         query = query + ',\n' if query else query
+#         query += "('{x}', '{y}')".format(x=x, y=y)
+#     if query:
+#         query = ('select * from {schema}.traffic.accident_analysis where '
+#                  '(longitude_str, latitude_str) IN UNNEST([{query}]) order by year_accident;').format(
+#             schema=big_query.catalog, query=query)
+#         t0 = time.time()
+#         is_ok, ans_big = big_query.execute_script(query)
+#         print('чтение из big-query', 'получено строк=', len(ans_big), 'время=', time.time() - t0)
+#         if is_ok:
+#             t0 = time.time()
+#             count = make_data_accident(answer, ans_big)
+#             print('make_data_accident', 'count=', count, 'время=', time.time() - t0)
+#         else:
+#             flash(ans_big, 'warning')
 
 
 def load_accidents_postgresql(answer):
